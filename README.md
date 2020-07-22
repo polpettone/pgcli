@@ -1,12 +1,8 @@
 
-# cli for gitlab 
+# Command Line Interace for Gitlab 
 
-## Purpose
-Keine Lust auf die langsame web ui von gitlab? 
-Schneller Zugriff auf eure Pipelines, deren Jobs und deren Logs? 
+## Features
 
-## Vorraussetzung
-Gitlab Project Urls -> TODO: as config
-Gitlab Project ID -> TODO: as config
-Gitlab API Token -> env var
+## Installation
 
+## Configuration
