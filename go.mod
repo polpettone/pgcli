@@ -1,4 +1,4 @@
-module github.com/polpetone/polpacli
+module github.com/polpettone/pgcli
 
 go 1.14
 

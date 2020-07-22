@@ -16,7 +16,7 @@ limitations under the License.
 package main
 
 import (
-	"github.com/polpetone/polpacli/cmd"
+	"github.com/polpettone/pgcli/cmd"
 )
 
 
