@@ -72,8 +72,6 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string) ([]GitlabPipe
 		 url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?status=" + status
 	}
 
-	fmt.Printf("Project ID %s\n", gitlabAPIClient.ProjectID)
-
 	req, err := http.NewRequest("GET",  url, nil)
 	if err != nil {
 		return nil, err

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
 	"strconv"
@@ -40,10 +39,17 @@ func getPipelineSuggestions(apiClient APIClient) []string {
 }
 
 func handleJobsCommand(args []string, apiClient APIClient) (string, error) {
+
+	var pipelineId string
+
 	if len(args) < 1 || args[0] == "" {
-		return "", errors.New(fmt.Sprintf("you need to inform a pipelineId"))
+		pipelines, _ := apiClient.getPipelines("")
+		pipeline , _ :=  showPipelineSelectionPrompt(pipelines)
+		pipelineId = strconv.Itoa(pipeline.Id)
+	} else {
+		pipelineId = args[0]
 	}
-	pipelineId := args[0]
+
 
 	jobs, err := apiClient.getJobs(pipelineId)
 	if err != nil {
