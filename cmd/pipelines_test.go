@@ -23,7 +23,7 @@ func (m MockGitlabAPIClient) getJobs(pipelineId string) ([]GitlabJob, error) {
 	panic("implement me")
 }
 
-func (m MockGitlabAPIClient) getPipelines() ([]GitlabPipeline, error) {
+func (m MockGitlabAPIClient) getPipelines(status string) ([]GitlabPipeline, error) {
 
 	var p0 = GitlabPipeline{
 		Id:        0,
