@@ -28,3 +28,26 @@ func showPipelineSelectionPrompt(pipelines []GitlabPipeline) (*GitlabPipeline, e
 	return &pipelines[i], nil
 }
 
+func showJobSelectionPrompt(jobs []GitlabJob) (*GitlabJob, error) {
+
+	templates := &promptui.SelectTemplates{
+		Active:   "\U00001B61 {{ .Name | red }} {{ .Status | green }} {{ .StartedAt | green }} {{ .FinishedAt | green }} {{ .Duration | green }} ",
+		Inactive:   "{{ .Name | blue }} {{ .Status | blue }} {{ .StartedAt | blue}} {{ .FinishedAt | blue }} {{ .Duration | blue }} ",
+		Selected:   "\U00001B61 {{ .Name | red }} {{ .Status | green }} {{ .StartedAt | green }} {{ .FinishedAt | green }} {{ .Duration | green }} ",
+	}
+
+	prompt := promptui.Select{
+		Label:     "Which Job",
+		Items:     jobs,
+		Templates: templates,
+		Size:      20,
+	}
+
+	i, _, err := prompt.Run()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &jobs[i], nil
+}

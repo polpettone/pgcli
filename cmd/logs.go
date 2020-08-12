@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
+	"strconv"
 )
 
 func NewLogsCmd(apiClient APIClient) *cobra.Command {
@@ -24,15 +24,28 @@ func NewLogsCmd(apiClient APIClient) *cobra.Command {
 
 func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient APIClient) (string, error) {
 	lastFailed, _ := cobraCommand.Flags().GetBool("lastFailed")
+
+	var jobID string
+
 	if (len(args) < 1 || args[0] == "") && lastFailed == false {
-		return "", errors.New(
-			"you need to inform a job id or set -l flag to see the logs from the last failed job")
-	}
-	if lastFailed {
-		return apiClient.getLastFailLog()
-	} else {
-		jobID := args[0]
+
+		pipelines, _ := apiClient.getPipelines("")
+		pipeline, _ := showPipelineSelectionPrompt(pipelines)
+		pipelineId := strconv.Itoa(pipeline.Id)
+
+		jobs, _ := apiClient.getJobs(pipelineId)
+		job, _ := showJobSelectionPrompt(jobs)
+		jobID = strconv.Itoa(job.Id)
+
 		return apiClient.getLog(jobID)
+	} else {
+
+		if lastFailed {
+			return apiClient.getLastFailLog()
+		} else {
+			jobID = args[0]
+			return apiClient.getLog(jobID)
+		}
 	}
 }
 
