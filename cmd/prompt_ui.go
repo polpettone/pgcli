@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/manifoldco/promptui"
+	"os"
 )
 
 func showPipelineSelectionPrompt(pipelines []GitlabPipeline) (*GitlabPipeline, error) {
@@ -22,6 +23,11 @@ func showPipelineSelectionPrompt(pipelines []GitlabPipeline) (*GitlabPipeline, e
 	i, _, err := prompt.Run()
 
 	if err != nil {
+
+		if err == promptui.ErrInterrupt {
+			os.Exit(1)
+		}
+
 		return nil, err
 	}
 
@@ -46,6 +52,9 @@ func showJobSelectionPrompt(jobs []GitlabJob) (*GitlabJob, error) {
 	i, _, err := prompt.Run()
 
 	if err != nil {
+		if err == promptui.ErrInterrupt {
+			os.Exit(1)
+		}
 		return nil, err
 	}
 
