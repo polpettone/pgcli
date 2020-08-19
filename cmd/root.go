@@ -72,7 +72,16 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		//fmt.Println("Using config file:", viper.ConfigFileUsed())
 	} else {
-		fmt.Println("No Config file found")
+
+		out := `No Config file found
+Provide a config file named .pgcli in $HOME
+Format yaml
+Content:
+	project_id: <project id>
+	url: https://gitlab.com/api/v4/projects
+	api_token: <api token>`
+
+		fmt.Println(out)
 		os.Exit(1)
 	}
 }
