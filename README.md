@@ -6,13 +6,19 @@ Show Jobs
 Show Logs
 
 ## Installation
-''' go install ''' TODO: Directory structure?
+``` go install ```
+
+TODO: Directory structure?
 
 ## Configuration
 
-set these env vars
+$HOME/.pgcli
 
-GITLAB_API_TOKEN
-GITLAB_PROJECT_URL
-GITLAB_PROJECT_ID
+
+```
+project_id: <project id>
+url: https://gitlab.com/api/v4/projects
+api_token: <api token>
+```
+
 
