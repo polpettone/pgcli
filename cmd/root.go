@@ -32,7 +32,9 @@ var rootCmd = &cobra.Command{
 	Short: "A brief description of your application",
 	Long: "",
 
-	Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "pgcli: try 'pgcli --help' for more information")
+	},
 }
 
 func Execute() {
