@@ -37,9 +37,9 @@ func showPipelineSelectionPrompt(pipelines []GitlabPipeline) (*GitlabPipeline, e
 func showJobSelectionPrompt(jobs []GitlabJob) (*GitlabJob, error) {
 
 	templates := &promptui.SelectTemplates{
-		Active:   "\U00001B61 {{ .Name | red }} {{ .Status | green }} {{ .StartedAt | green }} {{ .FinishedAt | green }} {{ .Duration | green }} ",
-		Inactive:   "{{ .Name | blue }} {{ .Status | blue }} {{ .StartedAt | blue}} {{ .FinishedAt | blue }} {{ .Duration | blue }} ",
-		Selected:   "\U00001B61 {{ .Name | red }} {{ .Status | green }} {{ .StartedAt | green }} {{ .FinishedAt | green }} {{ .Duration | green }} ",
+		Active:   "\U00001B61 {{ .Status | red }} {{ .StartedAt | green }} {{ .FinishedAt | green }} {{ .Duration | green }}  {{ .Name | green }} ",
+		Inactive:   "{{ .Status | blue }}  {{ .StartedAt | blue}} {{ .FinishedAt | blue }} {{ .Duration | blue }} {{ .Name | blue }} ",
+		Selected:   "\U00001B61 {{ .Status | red }} {{ .StartedAt | green }} {{ .FinishedAt | green }} {{ .Duration | green }} {{ .Name | green }} ",
 	}
 
 	prompt := promptui.Select{
