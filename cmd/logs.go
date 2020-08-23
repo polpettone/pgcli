@@ -9,9 +9,9 @@ import (
 func NewLogsCmd(apiClient APIClient) *cobra.Command {
 	return &cobra.Command{
 		Use:
-		"logs <jobID> or logs -l",
-		Short: "logs -l shows the log of the last failed job",
-		Long:  "",
+		"logs -> interactive mode| logs <jobID> -> logs of job | logs -l -> logs of last failed job",
+		Short: "when no job id " +
+			"is given, interactive mode started to choose a pipeline, then a job to see logs or use flag -l to see log of the last failed job",
 		Run: func(cmd *cobra.Command, args []string) {
 			stdout, err := handleLogsCommand(cmd, args, apiClient)
 			if err != nil {
