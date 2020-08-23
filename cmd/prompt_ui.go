@@ -8,9 +8,9 @@ import (
 func showPipelineSelectionPrompt(pipelines []GitlabPipeline) (*GitlabPipeline, error) {
 
 	templates := &promptui.SelectTemplates{
-		Active:   "\U00001B61 {{ .Id | red }} {{ .CreatedAt | green }} {{ .UpdatedAt | green }} {{ .Status | green }}",
-		Inactive:  "{{ .Id | blue }} {{ .CreatedAt | blue }} {{ .UpdatedAt | blue }} {{ .Status | blue }}",
-		Selected:   "\U00001B61 {{ .Id | green }} {{ .CreatedAt | green }} {{ .UpdatedAt | green }} {{ .Status | green }}",
+		Active:   "\U00001B61 {{ .Id | red }} {{ .CreatedAt | green }} {{ .UpdatedAt | green }} {{.Duration | green}} {{ .Status | green }}",
+		Inactive:  "{{ .Id | blue }} {{ .CreatedAt | blue }} {{ .UpdatedAt | blue }} {{.Duration | green}} {{ .Status | blue }}",
+		Selected:   "\U00001B61 {{ .Id | green }} {{ .CreatedAt | green }} {{ .UpdatedAt | green }} {{.Duration | green}} {{ .Status | green }}",
 	}
 
 	prompt := promptui.Select{

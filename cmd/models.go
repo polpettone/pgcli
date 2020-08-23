@@ -28,6 +28,18 @@ type GitlabPipeline struct {
 	Status string
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	Duration time.Duration
+}
+
+func NewGitlabPipeline(pipeline GitlabPipeline) *GitlabPipeline {
+	duration := pipeline.UpdatedAt.Sub(pipeline.CreatedAt)
+	return &GitlabPipeline{
+		Id: pipeline.Id,
+		Status: pipeline.Status,
+		CreatedAt: pipeline.CreatedAt,
+		UpdatedAt: pipeline.UpdatedAt,
+		Duration: duration,
+	}
 }
 
 func (job *GitlabJob) niceString() string {
@@ -64,6 +76,14 @@ func convertJsonToGitlabPipelines(jsonData []byte) (*[]GitlabPipeline, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &pipelines, nil
+
+	pipelinesWithDuration :=  make([]GitlabPipeline, 0)
+
+	for _, p := range(pipelines) {
+		withDuration := NewGitlabPipeline(p)
+		pipelinesWithDuration = append(pipelinesWithDuration, *withDuration)
+	}
+
+	return &pipelinesWithDuration, nil
 }
 
