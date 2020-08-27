@@ -10,10 +10,6 @@ type GitlabJobs struct {
 	Jobs []GitlabJob
 }
 
-type GitlabPipelines struct {
-	Pipelines []GitlabPipelines
-}
-
 type GitlabJob struct {
 	Id int `json:"id"`
 	Status string
