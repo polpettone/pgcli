@@ -48,7 +48,6 @@ func NewReport(pipelines []GitlabPipeline) *Report {
 		}
 	}
 
-
 	return &Report{
 		Pipelines: pipelines,
 		PipelineSuccessCount: pipelineSuccessCounter,
@@ -59,8 +58,8 @@ func NewReport(pipelines []GitlabPipeline) *Report {
 func (report *Report) niceString() string {
 	pipelineCount := len(report.Pipelines)
 	out := fmt.Sprintf("Pipeline Count: %d\n", pipelineCount)
-	out += fmt.Sprintf("Failed Pipelines:  %d\n", report.PipelineSuccessCount)
-	out += fmt.Sprintf("Succeeded Pipelines:  %d\n", report.PipelineFailedCount)
+	out += fmt.Sprintf("Failed Pipelines:  %d\n", report.PipelineFailedCount)
+	out += fmt.Sprintf("Succeeded Pipelines:  %d\n", report.PipelineSuccessCount)
 	return out
 }
 
