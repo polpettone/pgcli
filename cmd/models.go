@@ -27,6 +27,48 @@ type GitlabPipeline struct {
 	Duration time.Duration
 }
 
+type Report struct {
+	Pipelines []GitlabPipeline
+	PipelineSuccessCount int
+	PipelineFailedCount int
+}
+
+
+func NewReport(pipelines []GitlabPipeline) *Report {
+
+	pipelineSuccessCounter := 0
+	pipelineFailCounter := 0
+
+	for _, p := range pipelines {
+		if p.Status == "success" {
+			pipelineSuccessCounter++
+		}
+		if p.Status == "failed" {
+			pipelineFailCounter++
+		}
+	}
+
+
+	return &Report{
+		Pipelines: pipelines,
+		PipelineSuccessCount: pipelineSuccessCounter,
+		PipelineFailedCount: pipelineFailCounter,
+	}
+}
+
+func (report *Report) niceString() string {
+	pipelineCount := len(report.Pipelines)
+	out := fmt.Sprintf("Pipeline Count: %d\n", pipelineCount)
+	out += fmt.Sprintf("Failed Pipelines:  %d\n", report.PipelineSuccessCount)
+	out += fmt.Sprintf("Succeeded Pipelines:  %d\n", report.PipelineFailedCount)
+	return out
+}
+
+
+
+
+
+
 func NewGitlabPipeline(pipeline GitlabPipeline) *GitlabPipeline {
 	duration := pipeline.UpdatedAt.Sub(pipeline.CreatedAt)
 	return &GitlabPipeline{
