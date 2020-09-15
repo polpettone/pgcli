@@ -11,28 +11,37 @@ type GitlabJobs struct {
 }
 
 type GitlabJob struct {
-	Id int `json:"id"`
-	Status string
-	StartedAt time.Time `json:"started_at"`
+	Id         int `json:"id"`
+	Status     string
+	StartedAt  time.Time `json:"started_at"`
 	FinishedAt time.Time `json:"finished_at"`
-	Duration float64
-	Name string
+	Duration   float64
+	Name       string
 }
 
 type GitlabPipeline struct {
-	Id int `json:"id"`
-	Status string
+	Id        int `json:"id"`
+	Status    string
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	Duration time.Duration
+	Duration  time.Duration
+	PipelineUser PipelineUser `json:"user"`
+}
+
+type PipelineUser struct {
+	Name      string `json:"name"`
+	UserName  string `json:"username"`
+	ID        int `json:"id"`
+	State     string `json:"state"`
+	AvatarUrl string `json:"avatar_url"`
+	WebURL    string `json:"web_url"`
 }
 
 type Report struct {
-	Pipelines []GitlabPipeline
+	Pipelines            []GitlabPipeline
 	PipelineSuccessCount int
-	PipelineFailedCount int
+	PipelineFailedCount  int
 }
-
 
 func NewReport(pipelines []GitlabPipeline) *Report {
 
@@ -49,9 +58,9 @@ func NewReport(pipelines []GitlabPipeline) *Report {
 	}
 
 	return &Report{
-		Pipelines: pipelines,
+		Pipelines:            pipelines,
 		PipelineSuccessCount: pipelineSuccessCounter,
-		PipelineFailedCount: pipelineFailCounter,
+		PipelineFailedCount:  pipelineFailCounter,
 	}
 }
 
@@ -63,19 +72,15 @@ func (report *Report) niceString() string {
 	return out
 }
 
-
-
-
-
-
 func NewGitlabPipeline(pipeline GitlabPipeline) *GitlabPipeline {
 	duration := pipeline.UpdatedAt.Sub(pipeline.CreatedAt)
 	return &GitlabPipeline{
-		Id: pipeline.Id,
-		Status: pipeline.Status,
+		Id:        pipeline.Id,
+		Status:    pipeline.Status,
 		CreatedAt: pipeline.CreatedAt,
 		UpdatedAt: pipeline.UpdatedAt,
-		Duration: duration,
+		PipelineUser: pipeline.PipelineUser,
+		Duration:  duration,
 	}
 }
 
@@ -91,15 +96,12 @@ func (job *GitlabJob) niceString() string {
 }
 
 func (p *GitlabPipeline) niceString() string {
-
-	duration := p.UpdatedAt.Sub(p.CreatedAt).Minutes()
-
-	return fmt.Sprintf("%d \t %s \t %s \t %s \t %f",
-		p.Id, p.Status, p.CreatedAt, p.UpdatedAt, duration)
+	return fmt.Sprintf("%d \t %s \t %s \t %s \t %s \t %s",
+		p.Id, p.Status, p.CreatedAt, p.UpdatedAt, p.Duration, p.PipelineUser.UserName)
 }
 
 func convertJsonToGitlabJobs(jsonData []byte) (*[]GitlabJob, error) {
-	jobs :=  make([]GitlabJob, 0)
+	jobs := make([]GitlabJob, 0)
 	err := json.Unmarshal(jsonData, &jobs)
 	if err != nil {
 		return nil, err
@@ -107,20 +109,28 @@ func convertJsonToGitlabJobs(jsonData []byte) (*[]GitlabJob, error) {
 	return &jobs, nil
 }
 
+func convertJsonToPipeline(jsonData []byte) (*GitlabPipeline, error) {
+	var pipeline GitlabPipeline
+	err := json.Unmarshal(jsonData, &pipeline)
+	if err != nil {
+		return nil, err
+	}
+	return NewGitlabPipeline(pipeline), nil
+}
+
 func convertJsonToGitlabPipelines(jsonData []byte) (*[]GitlabPipeline, error) {
-	pipelines :=  make([]GitlabPipeline, 0)
+	pipelines := make([]GitlabPipeline, 0)
 	err := json.Unmarshal(jsonData, &pipelines)
 	if err != nil {
 		return nil, err
 	}
 
-	pipelinesWithDuration :=  make([]GitlabPipeline, 0)
+	pipelinesWithDuration := make([]GitlabPipeline, 0)
 
-	for _, p := range(pipelines) {
+	for _, p := range pipelines {
 		withDuration := NewGitlabPipeline(p)
 		pipelinesWithDuration = append(pipelinesWithDuration, *withDuration)
 	}
 
 	return &pipelinesWithDuration, nil
 }
-

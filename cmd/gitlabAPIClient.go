@@ -12,7 +12,7 @@ import (
 
 type APIClient interface {
 	getJobs(pipelineId string) ([]GitlabJob, error)
-	getPipelines(status string) ([]GitlabPipeline, error)
+	getPipelines(status string, withUser bool) ([]GitlabPipeline, error)
 	getLog(jobID string) (string, error)
 	getLastFailLog() (string, error)
 }
@@ -63,7 +63,7 @@ func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]GitlabJob,
 	return *jobs, nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) getPipelines(status string) ([]GitlabPipeline, error) {
+func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool) ([]GitlabPipeline, error) {
 
 	var url string
 	if status == "" {
@@ -97,13 +97,59 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string) ([]GitlabPipe
 		return nil, err
 	}
 
-	sortedPipelines := *pipelines
+	var sortedPipelines []GitlabPipeline
+
+	if withUser {
+		var enrichedPipelines []GitlabPipeline
+		for _, p := range *pipelines {
+			enriched, err := gitlabAPIClient.getPipeline(p.Id)
+			if err != nil {
+				return nil, err
+			}
+			enrichedPipelines = append(enrichedPipelines, *enriched)
+		}
+		sortedPipelines = enrichedPipelines
+	} else {
+		sortedPipelines = *pipelines
+	}
 
 	sort.Slice(sortedPipelines[:], func(i, j int) bool {
 		return sortedPipelines[i].CreatedAt.After(sortedPipelines[j].CreatedAt)
 	})
 
 	return sortedPipelines, nil
+}
+
+
+func (gitlabAPIClient GitlabAPIClient) getPipeline(id int) (*GitlabPipeline, error) {
+	url := gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines" + "/" + strconv.Itoa(id)
+
+	req, err := http.NewRequest("GET",  url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("PRIVATE-TOKEN", gitlabAPIClient.GitlabAPIToken)
+	client := &http.Client{Timeout: time.Second * 5}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	pipeline, err := convertJsonToPipeline(body)
+	if err != nil {
+		return nil, err
+	}
+
+	return pipeline, nil
 }
 
 
@@ -134,7 +180,7 @@ func (gitlabAPIClient GitlabAPIClient) getLog(jobID string) (string, error) {
 
 func (gitlabAPIClient GitlabAPIClient) getLastFailLog() (string, error) {
 
-	pipelines, err := gitlabAPIClient.getPipelines("failed")
+	pipelines, err := gitlabAPIClient.getPipelines("failed", false)
 	if err != nil {
 		return "", err
 	}

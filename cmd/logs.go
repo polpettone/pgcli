@@ -29,7 +29,7 @@ func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient API
 
 	if (len(args) < 1 || args[0] == "") && lastFailed == false {
 
-		pipelines, _ := apiClient.getPipelines("")
+		pipelines, _ := apiClient.getPipelines("", false)
 		pipeline, _ := showPipelineSelectionPrompt(pipelines)
 		pipelineId := strconv.Itoa(pipeline.Id)
 

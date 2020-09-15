@@ -22,7 +22,8 @@ func NewPipelinesCmd(apiClient APIClient) *cobra.Command{
 
 func handlePipelineCommand(cobraCommand *cobra.Command, apiClient APIClient) (string, error) {
 	status, _  := cobraCommand.Flags().GetString("status")
-	pipelines, err := apiClient.getPipelines(status)
+	withUser, _ := cobraCommand.Flags().GetBool("user")
+	pipelines, err := apiClient.getPipelines(status, withUser)
 	if err != nil {
 		return "", err
 	}
@@ -36,6 +37,7 @@ func handlePipelineCommand(cobraCommand *cobra.Command, apiClient APIClient) (st
 
 func init() {
 	pipelinesCmd := NewPipelinesCmd(gitlabAPIClient)
+
 	pipelinesCmd.Flags().StringP(
 		"status",
 			  "s",
@@ -43,6 +45,15 @@ func init() {
 			  "filter pipelines by status: " +
 			  "running, pending, success, failed, canceled, skipped, created, manual",
 		)
+
+	pipelinesCmd.Flags().BoolP(
+		"user",
+		"u",
+		false,
+		"shows user which triggered the pipeline." +
+			"Takes longer due more api calls (each per pipeline)",
+	)
+
 	rootCmd.AddCommand(pipelinesCmd)
 
 }
