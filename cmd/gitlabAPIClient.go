@@ -70,9 +70,9 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool
 
 	var url string
 	if status == "" {
-		 url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?per_page="+pipelineCount
+		 url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?order_by=updated_at&per_page="+pipelineCount
 	} else {
-		 url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?per_page="+pipelineCount+"&status=" + status
+		 url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?order_by=updated_at&per_page="+pipelineCount+"&status=" + status
 	}
 
 	req, err := http.NewRequest("GET",  url, nil)
@@ -100,8 +100,6 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool
 		return nil, err
 	}
 
-	var sortedPipelines []*models.Pipeline
-
 	if withUser {
 		var enrichedPipelines []*models.Pipeline
 		for _, p := range pipelines {
@@ -111,13 +109,11 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool
 			}
 			enrichedPipelines = append(enrichedPipelines, enriched)
 		}
-		sortedPipelines = enrichedPipelines
-	} else {
-		sortedPipelines = pipelines
+		pipelines = enrichedPipelines
 	}
 
 	if withCommitTitle {
-		for _, p := range sortedPipelines {
+		for _, p := range pipelines {
 			jobs, err := gitlabAPIClient.getJobs(strconv.Itoa(p.Id))
 			if err != nil {
 				return nil, err
@@ -126,11 +122,7 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool
 		}
 	}
 
-	sort.Slice(sortedPipelines[:], func(i, j int) bool {
-		return sortedPipelines[i].CreatedAt.After(sortedPipelines[j].CreatedAt)
-	})
-
-	return sortedPipelines, nil
+	return pipelines, nil
 }
 
 
