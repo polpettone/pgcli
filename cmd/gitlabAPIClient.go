@@ -12,7 +12,7 @@ import (
 
 type APIClient interface {
 	getJobs(pipelineId string) ([]Job, error)
-	getPipelines(status string, withUser bool) ([]Pipeline, error)
+	getPipelines(status string, withUser bool, count int) ([]Pipeline, error)
 	getLog(jobID string) (string, error)
 	getLastFailLog() (string, error)
 }
@@ -63,13 +63,15 @@ func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]Job, error
 	return *jobs, nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool) ([]Pipeline, error) {
+func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool, count int) ([]Pipeline, error) {
+
+	pipelineCount := strconv.Itoa(count)
 
 	var url string
 	if status == "" {
-		 url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines"
+		 url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?per_page="+pipelineCount
 	} else {
-		 url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?status=" + status
+		 url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?per_page="+pipelineCount+"&status=" + status
 	}
 
 	req, err := http.NewRequest("GET",  url, nil)
@@ -180,7 +182,7 @@ func (gitlabAPIClient GitlabAPIClient) getLog(jobID string) (string, error) {
 
 func (gitlabAPIClient GitlabAPIClient) getLastFailLog() (string, error) {
 
-	pipelines, err := gitlabAPIClient.getPipelines("failed", false)
+	pipelines, err := gitlabAPIClient.getPipelines("failed", false, 20)
 	if err != nil {
 		return "", err
 	}

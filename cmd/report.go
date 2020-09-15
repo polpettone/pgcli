@@ -23,7 +23,7 @@ func NewReportCmd(apiClient APIClient) *cobra.Command{
 func handleReportCommand(cobraCommand *cobra.Command, apiClient APIClient) (string, error) {
 	allStatus := ""
 
-	pipelines, err := apiClient.getPipelines(allStatus, false)
+	pipelines, err := apiClient.getPipelines(allStatus, false, 20)
 
 	if err != nil {
 		return "", err

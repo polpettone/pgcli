@@ -23,7 +23,8 @@ func NewPipelinesCmd(apiClient APIClient) *cobra.Command{
 func handlePipelineCommand(cobraCommand *cobra.Command, apiClient APIClient) (string, error) {
 	status, _  := cobraCommand.Flags().GetString("status")
 	withUser, _ := cobraCommand.Flags().GetBool("user")
-	pipelines, err := apiClient.getPipelines(status, withUser)
+	count, _ := cobraCommand.Flags().GetInt("count")
+	pipelines, err := apiClient.getPipelines(status, withUser, count)
 	if err != nil {
 		return "", err
 	}
@@ -52,6 +53,13 @@ func init() {
 		false,
 		"shows user which triggered the pipeline." +
 			"Takes longer due more api calls (each per pipeline)",
+	)
+
+	pipelinesCmd.Flags().IntP(
+		"count",
+		"c",
+		20,
+		"Count of Pipelines returned. 100 is max" ,
 	)
 
 	rootCmd.AddCommand(pipelinesCmd)
