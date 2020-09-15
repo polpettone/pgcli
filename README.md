@@ -1,14 +1,10 @@
 # Command Line Interace for Gitlab 
 
 ## Features
-Show pipelines 
-Show Jobs 
-Show Logs
+Show Pipelines, Jobs and Logs
 
 ## Installation
 ``` go install ```
-
-TODO: Directory structure?
 
 ## Configuration
 
