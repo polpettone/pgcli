@@ -17,9 +17,9 @@ type Logging struct {
 
 func NewLogging() *Logging {
 
-	infoLog := log.New(openLogFile("info.log"), "INFO\t", log.Ldate|log.Ltime)
-	debugLog := log.New(openLogFile("debug.log"), "DEBUG\t", log.Ldate|log.Ltime)
-	errorLog := log.New(openLogFile("error.log"),"ERROR\t", log.Ldate|log.Ltime)
+	infoLog := log.New(openLogFile("pgcli_info.log"), "INFO\t", log.Ldate|log.Ltime)
+	debugLog := log.New(openLogFile("pgcli_debug.log"), "DEBUG\t", log.Ldate|log.Ltime)
+	errorLog := log.New(openLogFile("pgcli_error.log"),"ERROR\t", log.Ldate|log.Ltime)
 
 	app := &Logging{
 		errorLog: errorLog,
