@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"github.com/polpettone/pgcli/cmd/models"
 	"io/ioutil"
 	"testing"
 	"time"
@@ -19,27 +20,27 @@ type MockGitlabAPIClient struct {
 	ProjectID          string
 }
 
-func (m MockGitlabAPIClient) getJobs(pipelineId string) ([]Job, error) {
+func (m MockGitlabAPIClient) getJobs(pipelineId string) ([]models.Job, error) {
 	panic("implement me")
 }
 
-func (m MockGitlabAPIClient) getPipelines(status string) ([]Pipeline, error) {
+func (m MockGitlabAPIClient) getPipelines(status string) ([]models.Pipeline, error) {
 
-	var p0 = Pipeline{
+	var p0 = models.Pipeline{
 		Id:        0,
 		Status:    "",
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 	}
 
-	var p1 = Pipeline{
+	var p1 = models.Pipeline{
 		Id:        1,
 		Status:    "",
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 	}
 
-	return []Pipeline{p0, p1}, nil
+	return []models.Pipeline{p0, p1}, nil
 }
 
 func (m MockGitlabAPIClient) getLog(jobID string) (string, error) {

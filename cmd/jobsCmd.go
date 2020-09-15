@@ -58,7 +58,7 @@ func handleJobsCommand(args []string, apiClient APIClient) (string, error) {
 
 	value := ""
 	for _, job := range jobs {
-		value = value + "\n" + job.niceString()
+		value = value + "\n" + job.NiceString()
 	}
 
 	return value, nil

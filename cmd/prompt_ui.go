@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"github.com/manifoldco/promptui"
+	"github.com/polpettone/pgcli/cmd/models"
 	"os"
 )
 
-func showPipelineSelectionPrompt(pipelines []Pipeline) (*Pipeline, error) {
+func showPipelineSelectionPrompt(pipelines []models.Pipeline) (*models.Pipeline, error) {
 
 	templates := &promptui.SelectTemplates{
 		Active:   "\U00001B61 {{ .Id | red }} {{ .CreatedAt | green }} {{ .UpdatedAt | green }} {{.Duration | green}} {{ .Status | green }}",
@@ -34,7 +35,7 @@ func showPipelineSelectionPrompt(pipelines []Pipeline) (*Pipeline, error) {
 	return &pipelines[i], nil
 }
 
-func showJobSelectionPrompt(jobs []Job) (*Job, error) {
+func showJobSelectionPrompt(jobs []models.Job) (*models.Job, error) {
 
 	templates := &promptui.SelectTemplates{
 		Active:   "\U00001B61 {{ .Status | red }} {{ .StartedAt | green }} {{ .FinishedAt | green }} {{ .Duration | green }}  {{ .Name | green }} ",

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/polpettone/pgcli/cmd/models"
 	"io/ioutil"
 	"net/http"
 	"sort"
@@ -11,8 +12,8 @@ import (
 
 
 type APIClient interface {
-	getJobs(pipelineId string) ([]Job, error)
-	getPipelines(status string, withUser bool, count int) ([]Pipeline, error)
+	getJobs(pipelineId string) ([]models.Job, error)
+	getPipelines(status string, withUser bool, count int) ([]models.Pipeline, error)
 	getLog(jobID string) (string, error)
 	getLastFailLog() (string, error)
 }
@@ -31,7 +32,7 @@ func NewGitlabAPIClient(apiToken string, projectURL string, projectID string) AP
 	}
 }
 
-func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]Job, error) {
+func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]models.Job, error) {
 
 	var url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines/" + pipelineId + "/jobs"
 	req, err := http.NewRequest("GET",  url, nil)
@@ -55,7 +56,7 @@ func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]Job, error
 		return nil, err
 	}
 
-	jobs, err := convertJsonToJobs(body)
+	jobs, err := models.ConvertJsonToJobs(body)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +64,7 @@ func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]Job, error
 	return *jobs, nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool, count int) ([]Pipeline, error) {
+func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool, count int) ([]models.Pipeline, error) {
 
 	pipelineCount := strconv.Itoa(count)
 
@@ -94,15 +95,15 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool
 		return nil, err
 	}
 
-	pipelines, err := convertJsonToPipelines(body)
+	pipelines, err := models.ConvertJsonToPipelines(body)
 	if err != nil {
 		return nil, err
 	}
 
-	var sortedPipelines []Pipeline
+	var sortedPipelines []models.Pipeline
 
 	if withUser {
-		var enrichedPipelines []Pipeline
+		var enrichedPipelines []models.Pipeline
 		for _, p := range *pipelines {
 			enriched, err := gitlabAPIClient.getPipeline(p.Id)
 			if err != nil {
@@ -123,7 +124,7 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool
 }
 
 
-func (gitlabAPIClient GitlabAPIClient) getPipeline(id int) (*Pipeline, error) {
+func (gitlabAPIClient GitlabAPIClient) getPipeline(id int) (*models.Pipeline, error) {
 	url := gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines" + "/" + strconv.Itoa(id)
 
 	req, err := http.NewRequest("GET",  url, nil)
@@ -146,7 +147,7 @@ func (gitlabAPIClient GitlabAPIClient) getPipeline(id int) (*Pipeline, error) {
 		return nil, err
 	}
 
-	pipeline, err := convertJsonToPipeline(body)
+	pipeline, err := models.ConvertJsonToPipeline(body)
 	if err != nil {
 		return nil, err
 	}
@@ -201,13 +202,13 @@ func (gitlabAPIClient GitlabAPIClient) getLastFailLog() (string, error) {
 		return "", err
 	}
 
-	fmt.Printf(failedJob.niceString())
+	fmt.Printf(failedJob.NiceString())
 
 	return log, nil
 }
 
-func getLastFailedPipeline(pipelines []Pipeline) Pipeline {
-	var failedPipeline Pipeline
+func getLastFailedPipeline(pipelines []models.Pipeline) models.Pipeline {
+	var failedPipeline models.Pipeline
 
 	sort.Slice(pipelines[:], func(i, j int) bool {
 		return pipelines[i].CreatedAt.Before(pipelines[j].CreatedAt)
@@ -221,8 +222,8 @@ func getLastFailedPipeline(pipelines []Pipeline) Pipeline {
 	return failedPipeline
 }
 
-func getLastFailedJob(jobs []Job) Job {
-	var failedJob Job
+func getLastFailedJob(jobs []models.Job) models.Job {
+	var failedJob models.Job
 
 	sort.Slice(jobs[:], func(i, j int) bool {
 		return jobs[i].StartedAt.Before(jobs[j].StartedAt)

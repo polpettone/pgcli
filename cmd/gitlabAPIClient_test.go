@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/polpettone/pgcli/cmd/models"
 	"testing"
 	"time"
 )
@@ -34,7 +35,7 @@ func Test_convertJsonToGitlabJobs(t *testing.T) {
 
 	`)
 
-	gitlabJobs, err := convertJsonToJobs(jsonData)
+	gitlabJobs, err := models.convertJsonToJobs(jsonData)
 
 	fmt.Println(gitlabJobs)
 	fmt.Println(err)
@@ -42,23 +43,23 @@ func Test_convertJsonToGitlabJobs(t *testing.T) {
 
 func Test_getLastFailedPipeline(t *testing.T) {
 
-	var pipelines []Pipeline
+	var pipelines []models.Pipeline
 
-	p0 := Pipeline{
+	p0 := models.Pipeline{
 		CreatedAt:   time.Date(2020, 12, 17, 10, 0, 0, 0, time.UTC),
 		UpdatedAt:   time.Date(2020, 12, 17, 10, 0, 0, 0, time.UTC),
 		Id: 0,
 		Status: "failed",
 	}
 
-	p1 := Pipeline{
+	p1 := models.Pipeline{
 		CreatedAt:   time.Date(2021, 12, 17, 10, 0, 0, 0, time.UTC),
 		UpdatedAt:   time.Date(2020, 12, 17, 10, 0, 0, 0, time.UTC),
 		Id: 1,
 		Status: "failed",
 	}
 
-	p2 := Pipeline{
+	p2 := models.Pipeline{
 		CreatedAt:   time.Date(2019, 12, 17, 10, 0, 0, 0, time.UTC),
 		UpdatedAt:   time.Date(2020, 12, 17, 10, 0, 0, 0, time.UTC),
 		Id: 2,

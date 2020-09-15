@@ -30,7 +30,7 @@ func handlePipelineCommand(cobraCommand *cobra.Command, apiClient APIClient) (st
 	}
 	value := ""
 	for _, p := range pipelines {
-		value = value + "\n" + p.niceString()
+		value = value + "\n" + p.NiceString()
 	}
 	return value, nil
 }

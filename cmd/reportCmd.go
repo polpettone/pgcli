@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/polpettone/pgcli/cmd/models"
 	"github.com/spf13/cobra"
 )
 
@@ -29,9 +30,9 @@ func handleReportCommand(cobraCommand *cobra.Command, apiClient APIClient) (stri
 		return "", err
 	}
 
-	report := NewReport(pipelines)
+	report := models.NewReport(pipelines)
 
-	return report.niceString(), nil
+	return report.NiceString(), nil
 }
 
 
