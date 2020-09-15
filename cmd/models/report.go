@@ -5,12 +5,12 @@ import (
 )
 
 type Report struct {
-	Pipelines            []Pipeline
+	Pipelines            []*Pipeline
 	PipelineSuccessCount int
 	PipelineFailedCount  int
 }
 
-func NewReport(pipelines []Pipeline) *Report {
+func NewReport(pipelines []*Pipeline) *Report {
 
 	pipelineSuccessCounter := 0
 	pipelineFailCounter := 0

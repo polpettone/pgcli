@@ -24,7 +24,8 @@ func handlePipelineCommand(cobraCommand *cobra.Command, apiClient APIClient) (st
 	status, _  := cobraCommand.Flags().GetString("status")
 	withUser, _ := cobraCommand.Flags().GetBool("user")
 	count, _ := cobraCommand.Flags().GetInt("count")
-	pipelines, err := apiClient.getPipelines(status, withUser, count)
+	withCommitTitle, _ := cobraCommand.Flags().GetBool("commit-title")
+	pipelines, err := apiClient.getPipelines(status, withUser, count, withCommitTitle)
 	if err != nil {
 		return "", err
 	}
@@ -62,6 +63,12 @@ func init() {
 		"Count of Pipelines returned. 100 is max" ,
 	)
 
-	rootCmd.AddCommand(pipelinesCmd)
+	pipelinesCmd.Flags().BoolP(
+		"commit-title",
+		"t",
+		false,
+		"Show commit title for each pipeline. Take longer due more api calls" ,
+	)
 
+	rootCmd.AddCommand(pipelinesCmd)
 }

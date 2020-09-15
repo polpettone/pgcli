@@ -10,6 +10,11 @@ type Jobs struct {
 	Jobs []Job
 }
 
+type Commit struct {
+	Title string `json:"title"`
+	Message string `json:"message"`
+}
+
 type Job struct {
 	Id         int `json:"id"`
 	Status     string
@@ -17,6 +22,7 @@ type Job struct {
 	FinishedAt time.Time `json:"finished_at"`
 	Duration   float64
 	Name       string
+	Commit	   Commit `json:"commit"`
 }
 
 

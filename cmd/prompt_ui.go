@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func showPipelineSelectionPrompt(pipelines []models.Pipeline) (*models.Pipeline, error) {
+func showPipelineSelectionPrompt(pipelines []*models.Pipeline) (*models.Pipeline, error) {
 
 	templates := &promptui.SelectTemplates{
 		Active:   "\U00001B61 {{ .Id | red }} {{ .CreatedAt | green }} {{ .UpdatedAt | green }} {{.Duration | green}} {{ .Status | green }}",
@@ -32,7 +32,7 @@ func showPipelineSelectionPrompt(pipelines []models.Pipeline) (*models.Pipeline,
 		return nil, err
 	}
 
-	return &pipelines[i], nil
+	return pipelines[i], nil
 }
 
 func showJobSelectionPrompt(jobs []models.Job) (*models.Job, error) {

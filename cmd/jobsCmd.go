@@ -30,7 +30,7 @@ func NewJobsCmd(apiClient APIClient) *cobra.Command{
 }
 
 func getPipelineSuggestions(apiClient APIClient) []string {
-	pipelines, _ := apiClient.getPipelines("", false, 20)
+	pipelines, _ := apiClient.getPipelines("", false, 20, false)
 	var pipelineIds []string
 	for _, p := range pipelines[:5] {
 		pipelineIds = append(pipelineIds, strconv.Itoa(p.Id))
@@ -43,7 +43,7 @@ func handleJobsCommand(args []string, apiClient APIClient) (string, error) {
 	var pipelineId string
 
 	if len(args) < 1 || args[0] == "" {
-		pipelines, _ := apiClient.getPipelines("", false, 20)
+		pipelines, _ := apiClient.getPipelines("", false, 20, false)
 		pipeline , _ :=  showPipelineSelectionPrompt(pipelines)
 		pipelineId = strconv.Itoa(pipeline.Id)
 	} else {

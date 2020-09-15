@@ -13,7 +13,7 @@ import (
 
 type APIClient interface {
 	getJobs(pipelineId string) ([]models.Job, error)
-	getPipelines(status string, withUser bool, count int) ([]models.Pipeline, error)
+	getPipelines(status string, withUser bool, count int, withCommitTitle bool) ([]*models.Pipeline, error)
 	getLog(jobID string) (string, error)
 	getLastFailLog() (string, error)
 }
@@ -64,7 +64,7 @@ func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]models.Job
 	return *jobs, nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool, count int) ([]models.Pipeline, error) {
+func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool, count int, withCommitTitle bool) ([]*models.Pipeline, error) {
 
 	pipelineCount := strconv.Itoa(count)
 
@@ -100,20 +100,30 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool
 		return nil, err
 	}
 
-	var sortedPipelines []models.Pipeline
+	var sortedPipelines []*models.Pipeline
 
 	if withUser {
-		var enrichedPipelines []models.Pipeline
-		for _, p := range *pipelines {
+		var enrichedPipelines []*models.Pipeline
+		for _, p := range pipelines {
 			enriched, err := gitlabAPIClient.getPipeline(p.Id)
 			if err != nil {
 				return nil, err
 			}
-			enrichedPipelines = append(enrichedPipelines, *enriched)
+			enrichedPipelines = append(enrichedPipelines, enriched)
 		}
 		sortedPipelines = enrichedPipelines
 	} else {
-		sortedPipelines = *pipelines
+		sortedPipelines = pipelines
+	}
+
+	if withCommitTitle {
+		for _, p := range sortedPipelines {
+			jobs, err := gitlabAPIClient.getJobs(strconv.Itoa(p.Id))
+			if err != nil {
+				return nil, err
+			}
+			p.Jobs = jobs
+		}
 	}
 
 	sort.Slice(sortedPipelines[:], func(i, j int) bool {
@@ -183,7 +193,7 @@ func (gitlabAPIClient GitlabAPIClient) getLog(jobID string) (string, error) {
 
 func (gitlabAPIClient GitlabAPIClient) getLastFailLog() (string, error) {
 
-	pipelines, err := gitlabAPIClient.getPipelines("failed", false, 20)
+	pipelines, err := gitlabAPIClient.getPipelines("failed", false, 20, false)
 	if err != nil {
 		return "", err
 	}
@@ -207,8 +217,8 @@ func (gitlabAPIClient GitlabAPIClient) getLastFailLog() (string, error) {
 	return log, nil
 }
 
-func getLastFailedPipeline(pipelines []models.Pipeline) models.Pipeline {
-	var failedPipeline models.Pipeline
+func getLastFailedPipeline(pipelines []*models.Pipeline) *models.Pipeline {
+	var failedPipeline *models.Pipeline
 
 	sort.Slice(pipelines[:], func(i, j int) bool {
 		return pipelines[i].CreatedAt.Before(pipelines[j].CreatedAt)
