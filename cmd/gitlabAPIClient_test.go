@@ -34,7 +34,7 @@ func Test_convertJsonToGitlabJobs(t *testing.T) {
 
 	`)
 
-	gitlabJobs, err := convertJsonToGitlabJobs(jsonData)
+	gitlabJobs, err := convertJsonToJobs(jsonData)
 
 	fmt.Println(gitlabJobs)
 	fmt.Println(err)
@@ -42,23 +42,23 @@ func Test_convertJsonToGitlabJobs(t *testing.T) {
 
 func Test_getLastFailedPipeline(t *testing.T) {
 
-	var pipelines []GitlabPipeline
+	var pipelines []Pipeline
 
-	p0 := GitlabPipeline{
+	p0 := Pipeline{
 		CreatedAt:   time.Date(2020, 12, 17, 10, 0, 0, 0, time.UTC),
 		UpdatedAt:   time.Date(2020, 12, 17, 10, 0, 0, 0, time.UTC),
 		Id: 0,
 		Status: "failed",
 	}
 
-	p1 := GitlabPipeline{
+	p1 := Pipeline{
 		CreatedAt:   time.Date(2021, 12, 17, 10, 0, 0, 0, time.UTC),
 		UpdatedAt:   time.Date(2020, 12, 17, 10, 0, 0, 0, time.UTC),
 		Id: 1,
 		Status: "failed",
 	}
 
-	p2 := GitlabPipeline{
+	p2 := Pipeline{
 		CreatedAt:   time.Date(2019, 12, 17, 10, 0, 0, 0, time.UTC),
 		UpdatedAt:   time.Date(2020, 12, 17, 10, 0, 0, 0, time.UTC),
 		Id: 2,

@@ -19,27 +19,27 @@ type MockGitlabAPIClient struct {
 	ProjectID          string
 }
 
-func (m MockGitlabAPIClient) getJobs(pipelineId string) ([]GitlabJob, error) {
+func (m MockGitlabAPIClient) getJobs(pipelineId string) ([]Job, error) {
 	panic("implement me")
 }
 
-func (m MockGitlabAPIClient) getPipelines(status string) ([]GitlabPipeline, error) {
+func (m MockGitlabAPIClient) getPipelines(status string) ([]Pipeline, error) {
 
-	var p0 = GitlabPipeline{
+	var p0 = Pipeline{
 		Id:        0,
 		Status:    "",
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 	}
 
-	var p1 = GitlabPipeline{
+	var p1 = Pipeline{
 		Id:        1,
 		Status:    "",
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 	}
 
-	return []GitlabPipeline {p0, p1}, nil
+	return []Pipeline{p0, p1}, nil
 }
 
 func (m MockGitlabAPIClient) getLog(jobID string) (string, error) {

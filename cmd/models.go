@@ -6,11 +6,11 @@ import (
 	"time"
 )
 
-type GitlabJobs struct {
-	Jobs []GitlabJob
+type Jobs struct {
+	Jobs []Job
 }
 
-type GitlabJob struct {
+type Job struct {
 	Id         int `json:"id"`
 	Status     string
 	StartedAt  time.Time `json:"started_at"`
@@ -19,7 +19,7 @@ type GitlabJob struct {
 	Name       string
 }
 
-type GitlabPipeline struct {
+type Pipeline struct {
 	Id        int `json:"id"`
 	Status    string
 	CreatedAt time.Time `json:"created_at"`
@@ -38,12 +38,12 @@ type PipelineUser struct {
 }
 
 type Report struct {
-	Pipelines            []GitlabPipeline
+	Pipelines            []Pipeline
 	PipelineSuccessCount int
 	PipelineFailedCount  int
 }
 
-func NewReport(pipelines []GitlabPipeline) *Report {
+func NewReport(pipelines []Pipeline) *Report {
 
 	pipelineSuccessCounter := 0
 	pipelineFailCounter := 0
@@ -72,9 +72,9 @@ func (report *Report) niceString() string {
 	return out
 }
 
-func NewGitlabPipeline(pipeline GitlabPipeline) *GitlabPipeline {
+func NewPipeline(pipeline Pipeline) *Pipeline {
 	duration := pipeline.UpdatedAt.Sub(pipeline.CreatedAt)
-	return &GitlabPipeline{
+	return &Pipeline{
 		Id:        pipeline.Id,
 		Status:    pipeline.Status,
 		CreatedAt: pipeline.CreatedAt,
@@ -84,7 +84,7 @@ func NewGitlabPipeline(pipeline GitlabPipeline) *GitlabPipeline {
 	}
 }
 
-func (job *GitlabJob) niceString() string {
+func (job *Job) niceString() string {
 
 	durationInMinutes := 0.0
 	if job.Duration != 0 {
@@ -95,13 +95,13 @@ func (job *GitlabJob) niceString() string {
 		job.Id, job.Status, job.StartedAt, job.FinishedAt, durationInMinutes, job.Name)
 }
 
-func (p *GitlabPipeline) niceString() string {
+func (p *Pipeline) niceString() string {
 	return fmt.Sprintf("%d \t %s \t %s \t %s \t %s \t %s",
 		p.Id, p.Status, p.CreatedAt, p.UpdatedAt, p.Duration, p.PipelineUser.UserName)
 }
 
-func convertJsonToGitlabJobs(jsonData []byte) (*[]GitlabJob, error) {
-	jobs := make([]GitlabJob, 0)
+func convertJsonToJobs(jsonData []byte) (*[]Job, error) {
+	jobs := make([]Job, 0)
 	err := json.Unmarshal(jsonData, &jobs)
 	if err != nil {
 		return nil, err
@@ -109,26 +109,26 @@ func convertJsonToGitlabJobs(jsonData []byte) (*[]GitlabJob, error) {
 	return &jobs, nil
 }
 
-func convertJsonToPipeline(jsonData []byte) (*GitlabPipeline, error) {
-	var pipeline GitlabPipeline
+func convertJsonToPipeline(jsonData []byte) (*Pipeline, error) {
+	var pipeline Pipeline
 	err := json.Unmarshal(jsonData, &pipeline)
 	if err != nil {
 		return nil, err
 	}
-	return NewGitlabPipeline(pipeline), nil
+	return NewPipeline(pipeline), nil
 }
 
-func convertJsonToGitlabPipelines(jsonData []byte) (*[]GitlabPipeline, error) {
-	pipelines := make([]GitlabPipeline, 0)
+func convertJsonToPipelines(jsonData []byte) (*[]Pipeline, error) {
+	pipelines := make([]Pipeline, 0)
 	err := json.Unmarshal(jsonData, &pipelines)
 	if err != nil {
 		return nil, err
 	}
 
-	pipelinesWithDuration := make([]GitlabPipeline, 0)
+	pipelinesWithDuration := make([]Pipeline, 0)
 
 	for _, p := range pipelines {
-		withDuration := NewGitlabPipeline(p)
+		withDuration := NewPipeline(p)
 		pipelinesWithDuration = append(pipelinesWithDuration, *withDuration)
 	}
 

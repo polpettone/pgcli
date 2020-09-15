@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func showPipelineSelectionPrompt(pipelines []GitlabPipeline) (*GitlabPipeline, error) {
+func showPipelineSelectionPrompt(pipelines []Pipeline) (*Pipeline, error) {
 
 	templates := &promptui.SelectTemplates{
 		Active:   "\U00001B61 {{ .Id | red }} {{ .CreatedAt | green }} {{ .UpdatedAt | green }} {{.Duration | green}} {{ .Status | green }}",
@@ -34,7 +34,7 @@ func showPipelineSelectionPrompt(pipelines []GitlabPipeline) (*GitlabPipeline, e
 	return &pipelines[i], nil
 }
 
-func showJobSelectionPrompt(jobs []GitlabJob) (*GitlabJob, error) {
+func showJobSelectionPrompt(jobs []Job) (*Job, error) {
 
 	templates := &promptui.SelectTemplates{
 		Active:   "\U00001B61 {{ .Status | red }} {{ .StartedAt | green }} {{ .FinishedAt | green }} {{ .Duration | green }}  {{ .Name | green }} ",
