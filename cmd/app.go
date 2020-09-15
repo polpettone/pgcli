@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/spf13/viper"
 	"log"
 	"os"
 )
@@ -14,7 +13,6 @@ type Application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
 	debugLog      *log.Logger
-	AppClient     *GitlabAPIClient
 }
 
 func NewApplication() *Application {
@@ -23,16 +21,10 @@ func NewApplication() *Application {
 	debugLog := log.New(openLogFile("debug.log"), "DEBUG\t", log.Ldate|log.Ltime)
 	errorLog := log.New(openLogFile("error.log"),"ERROR\t", log.Ldate|log.Ltime)
 
-	gitlabAPIClient := NewGitlabAPIClient(
-		viper.GetString("api_token"),
-		viper.GetString("url"),
-		viper.GetString("project_id"))
-
 	app := &Application{
 		errorLog: errorLog,
 		infoLog: infoLog,
 		debugLog: debugLog,
-		AppClient: gitlabAPIClient,
 	}
 
 	return app

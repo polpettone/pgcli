@@ -65,7 +65,6 @@ func handleJobsCommand(args []string, apiClient APIClient) (string, error) {
 }
 
 func init() {
-	app := NewApplication()
-	jobsCmd := NewJobsCmd(app.AppClient)
+	jobsCmd := NewJobsCmd(NewGitlabAPIClient())
 	rootCmd.AddCommand(jobsCmd)
 }

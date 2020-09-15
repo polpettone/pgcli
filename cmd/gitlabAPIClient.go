@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/polpettone/pgcli/cmd/models"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
 	"sort"
@@ -21,13 +22,15 @@ type GitlabAPIClient struct {
 	GitlabAPIToken   string
 	GitlabProjectURL string
 	ProjectID        string
+	Application		 *Application
 }
 
-func NewGitlabAPIClient(apiToken string, projectURL string, projectID string) *GitlabAPIClient {
+func NewGitlabAPIClient() *GitlabAPIClient {
 	return &GitlabAPIClient{
-		GitlabAPIToken:   apiToken,
-		GitlabProjectURL: projectURL,
-		ProjectID:        projectID,
+		GitlabAPIToken:   viper.GetString("api_token"),
+		GitlabProjectURL: viper.GetString("url"),
+		ProjectID:        viper.GetString("project_id"),
+		Application: NewApplication(),
 	}
 }
 

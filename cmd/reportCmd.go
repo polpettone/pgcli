@@ -37,8 +37,7 @@ func handleReportCommand(cobraCommand *cobra.Command, apiClient APIClient) (stri
 
 
 func init() {
-	app := NewApplication()
-	reportCmd := NewReportCmd(app.AppClient)
+	reportCmd := NewReportCmd(NewGitlabAPIClient())
 	rootCmd.AddCommand(reportCmd)
 
 }

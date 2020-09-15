@@ -38,8 +38,7 @@ func handlePipelineCommand(cobraCommand *cobra.Command, apiClient APIClient) (st
 
 
 func init() {
-	app := NewApplication()
-	pipelinesCmd := NewPipelinesCmd(app.AppClient)
+	pipelinesCmd := NewPipelinesCmd(NewGitlabAPIClient())
 
 	pipelinesCmd.Flags().StringP(
 		"status",
