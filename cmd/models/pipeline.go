@@ -18,7 +18,7 @@ func NewPipeline(pipeline Pipeline) *Pipeline {
 	}
 }
 
-func (p *Pipeline) NiceString() string {
+func (p Pipeline) NiceString() string {
 	if len(p.Jobs) > 0 {
 		return fmt.Sprintf("%d \t %s \t %s \t %s \t %s \t %s \t%s",
 			p.Id, p.Status, p.CreatedAt, p.UpdatedAt, p.Duration, p.PipelineUser.UserName, p.Jobs[0].Commit.Title)

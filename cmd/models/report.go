@@ -31,7 +31,7 @@ func NewReport(pipelines []*Pipeline) *Report {
 	}
 }
 
-func (report *Report) NiceString() string {
+func (report Report) NiceString() string {
 	pipelineCount := len(report.Pipelines)
 	out := fmt.Sprintf("Pipeline Count: %d\n", pipelineCount)
 	out += fmt.Sprintf("Failed Pipelines:  %d\n", report.PipelineFailedCount)

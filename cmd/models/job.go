@@ -26,7 +26,7 @@ type Job struct {
 }
 
 
-func (job *Job) NiceString() string {
+func (job Job) NiceString() string {
 	durationInMinutes := 0.0
 	if job.Duration != 0 {
 		durationInMinutes = job.Duration / 60
