@@ -11,18 +11,12 @@ import (
 	"time"
 )
 
-type APIClient interface {
-	getJobs(pipelineId string) ([]models.Job, error)
-	getPipelines(status string, withUser bool, count int, withCommitTitle bool) ([]*models.Pipeline, error)
-	getLog(jobID string) (string, error)
-	getLastFailLog() (string, error)
-}
 
 type GitlabAPIClient struct {
 	GitlabAPIToken   string
 	GitlabProjectURL string
 	ProjectID        string
-	Application		 *Application
+	Logging          *Logging
 }
 
 func NewGitlabAPIClient() *GitlabAPIClient {
@@ -30,7 +24,7 @@ func NewGitlabAPIClient() *GitlabAPIClient {
 		GitlabAPIToken:   viper.GetString("api_token"),
 		GitlabProjectURL: viper.GetString("url"),
 		ProjectID:        viper.GetString("project_id"),
-		Application: NewApplication(),
+		Logging:          NewLogging(),
 	}
 }
 

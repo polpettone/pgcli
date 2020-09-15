@@ -9,19 +9,19 @@ func init() {
 	initConfig()
 }
 
-type Application struct {
+type Logging struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
 	debugLog      *log.Logger
 }
 
-func NewApplication() *Application {
+func NewLogging() *Logging {
 
 	infoLog := log.New(openLogFile("info.log"), "INFO\t", log.Ldate|log.Ltime)
 	debugLog := log.New(openLogFile("debug.log"), "DEBUG\t", log.Ldate|log.Ltime)
 	errorLog := log.New(openLogFile("error.log"),"ERROR\t", log.Ldate|log.Ltime)
 
-	app := &Application{
+	app := &Logging{
 		errorLog: errorLog,
 		infoLog: infoLog,
 		debugLog: debugLog,

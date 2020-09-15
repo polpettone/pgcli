@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewPipelinesCmd(apiClient APIClient) *cobra.Command{
+func NewPipelinesCmd(apiClient *GitlabAPIClient) *cobra.Command{
 	return &cobra.Command{
 		Use:   "pipelines",
 		Short: "shows the last 5 Pipelines",
@@ -20,7 +20,7 @@ func NewPipelinesCmd(apiClient APIClient) *cobra.Command{
 	}
 }
 
-func handlePipelineCommand(cobraCommand *cobra.Command, apiClient APIClient) (string, error) {
+func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *GitlabAPIClient) (string, error) {
 	status, _  := cobraCommand.Flags().GetString("status")
 	withUser, _ := cobraCommand.Flags().GetBool("user")
 	count, _ := cobraCommand.Flags().GetInt("count")

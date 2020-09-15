@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func NewLogsCmd(apiClient APIClient) *cobra.Command {
+func NewLogsCmd(apiClient *GitlabAPIClient) *cobra.Command {
 	return &cobra.Command{
 		Use:
 		"logs -> interactive mode| logs <jobID> -> logs of job | logs -l -> logs of last failed job",
@@ -22,7 +22,7 @@ func NewLogsCmd(apiClient APIClient) *cobra.Command {
 	}
 }
 
-func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient APIClient) (string, error) {
+func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient *GitlabAPIClient) (string, error) {
 	lastFailed, _ := cobraCommand.Flags().GetBool("lastFailed")
 
 	var jobID string

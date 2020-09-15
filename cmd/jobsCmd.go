@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func NewJobsCmd(apiClient APIClient) *cobra.Command{
+func NewJobsCmd(apiClient *GitlabAPIClient) *cobra.Command{
 	return &cobra.Command{
 		Use:   "jobs <pipelineID>",
 		Short: "list the jobs of a specific pipeline",
@@ -29,7 +29,7 @@ func NewJobsCmd(apiClient APIClient) *cobra.Command{
 	}
 }
 
-func getPipelineSuggestions(apiClient APIClient) []string {
+func getPipelineSuggestions(apiClient *GitlabAPIClient) []string {
 	pipelines, _ := apiClient.getPipelines("", false, 20, false)
 	var pipelineIds []string
 	for _, p := range pipelines[:5] {
@@ -38,7 +38,7 @@ func getPipelineSuggestions(apiClient APIClient) []string {
 	return pipelineIds
 }
 
-func handleJobsCommand(args []string, apiClient APIClient) (string, error) {
+func handleJobsCommand(args []string, apiClient *GitlabAPIClient) (string, error) {
 
 	var pipelineId string
 

@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewReportCmd(apiClient APIClient) *cobra.Command{
+func NewReportCmd(apiClient *GitlabAPIClient) *cobra.Command{
 	return &cobra.Command{
 		Use:   "report",
 		Short: "shows a report",
@@ -21,7 +21,7 @@ func NewReportCmd(apiClient APIClient) *cobra.Command{
 	}
 }
 
-func handleReportCommand(cobraCommand *cobra.Command, apiClient APIClient) (string, error) {
+func handleReportCommand(cobraCommand *cobra.Command, apiClient *GitlabAPIClient) (string, error) {
 	allStatus := ""
 
 	pipelines, err := apiClient.getPipelines(allStatus, false, 20, false)
