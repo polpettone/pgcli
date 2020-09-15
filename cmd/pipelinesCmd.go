@@ -8,8 +8,8 @@ import (
 func NewPipelinesCmd(apiClient APIClient) *cobra.Command{
 	return &cobra.Command{
 		Use:   "pipelines",
-		Short: "shows the last 20 Pipelines",
-		Long:  "shows the last 20 Pipelines",
+		Short: "shows the last 5 Pipelines",
+		Long:  "shows the last 5 Pipelines",
 		Run: func(cmd *cobra.Command, args []string) {
 			stdout, err := handlePipelineCommand(cmd, apiClient)
 			if err != nil {
@@ -59,7 +59,7 @@ func init() {
 	pipelinesCmd.Flags().IntP(
 		"count",
 		"c",
-		20,
+		5,
 		"Count of Pipelines returned. 100 is max" ,
 	)
 
