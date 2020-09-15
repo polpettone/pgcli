@@ -50,7 +50,8 @@ func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient API
 }
 
 func init() {
-	logsCmd := NewLogsCmd(gitlabAPIClient)
+	app := NewApplication()
+	logsCmd := NewLogsCmd(app.AppClient)
 	rootCmd.AddCommand(logsCmd)
 	logsCmd.Flags().BoolP(
 		"lastFailed",

@@ -10,7 +10,6 @@ import (
 	"time"
 )
 
-
 type APIClient interface {
 	getJobs(pipelineId string) ([]models.Job, error)
 	getPipelines(status string, withUser bool, count int, withCommitTitle bool) ([]*models.Pipeline, error)
@@ -19,12 +18,12 @@ type APIClient interface {
 }
 
 type GitlabAPIClient struct {
-	GitlabAPIToken     string
-	GitlabProjectURL    string
-	ProjectID          string
+	GitlabAPIToken   string
+	GitlabProjectURL string
+	ProjectID        string
 }
 
-func NewGitlabAPIClient(apiToken string, projectURL string, projectID string) APIClient {
+func NewGitlabAPIClient(apiToken string, projectURL string, projectID string) *GitlabAPIClient {
 	return &GitlabAPIClient{
 		GitlabAPIToken:   apiToken,
 		GitlabProjectURL: projectURL,
@@ -35,7 +34,7 @@ func NewGitlabAPIClient(apiToken string, projectURL string, projectID string) AP
 func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]models.Job, error) {
 
 	var url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines/" + pipelineId + "/jobs"
-	req, err := http.NewRequest("GET",  url, nil)
+	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
 		return nil, err
@@ -70,12 +69,12 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool
 
 	var url string
 	if status == "" {
-		 url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?order_by=updated_at&per_page="+pipelineCount
+		url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?order_by=updated_at&per_page=" + pipelineCount
 	} else {
-		 url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?order_by=updated_at&per_page="+pipelineCount+"&status=" + status
+		url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?order_by=updated_at&per_page=" + pipelineCount + "&status=" + status
 	}
 
-	req, err := http.NewRequest("GET",  url, nil)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -125,11 +124,10 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool
 	return pipelines, nil
 }
 
-
 func (gitlabAPIClient GitlabAPIClient) getPipeline(id int) (*models.Pipeline, error) {
 	url := gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines" + "/" + strconv.Itoa(id)
 
-	req, err := http.NewRequest("GET",  url, nil)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -157,10 +155,9 @@ func (gitlabAPIClient GitlabAPIClient) getPipeline(id int) (*models.Pipeline, er
 	return pipeline, nil
 }
 
-
 func (gitlabAPIClient GitlabAPIClient) getLog(jobID string) (string, error) {
-	var url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/jobs/"+ jobID +"/trace"
-	req, err := http.NewRequest("GET",  url, nil)
+	var url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/jobs/" + jobID + "/trace"
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return "", err
 	}
@@ -216,8 +213,8 @@ func getLastFailedPipeline(pipelines []*models.Pipeline) *models.Pipeline {
 		return pipelines[i].CreatedAt.Before(pipelines[j].CreatedAt)
 	})
 
-	for _, p  := range pipelines {
-		if p.Status == "failed"	{
+	for _, p := range pipelines {
+		if p.Status == "failed" {
 			failedPipeline = p
 		}
 	}
@@ -231,8 +228,8 @@ func getLastFailedJob(jobs []models.Job) models.Job {
 		return jobs[i].StartedAt.Before(jobs[j].StartedAt)
 	})
 
-	for _, j  := range jobs {
-		if j.Status == "failed"	{
+	for _, j := range jobs {
+		if j.Status == "failed" {
 			failedJob = j
 		}
 	}
