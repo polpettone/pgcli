@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 )
@@ -15,11 +16,22 @@ type Logging struct {
 	debugLog      *log.Logger
 }
 
-func NewLogging() *Logging {
+func NewLogging(enabled bool) *Logging {
 
-	infoLog := log.New(openLogFile("pgcli_info.log"), "INFO\t", log.Ldate|log.Ltime)
-	debugLog := log.New(openLogFile("pgcli_debug.log"), "DEBUG\t", log.Ldate|log.Ltime)
-	errorLog := log.New(openLogFile("pgcli_error.log"),"ERROR\t", log.Ldate|log.Ltime)
+	var infoLog *log.Logger
+	var debugLog *log.Logger
+	var errorLog *log.Logger
+
+	if enabled {
+		infoLog = log.New(openLogFile("pgcli_info.log"), "INFO\t", log.Ldate|log.Ltime)
+		debugLog = log.New(openLogFile("pgcli_debug.log"), "DEBUG\t", log.Ldate|log.Ltime)
+		errorLog = log.New(openLogFile("pgcli_error.log"), "ERROR\t", log.Ldate|log.Ltime)
+	} else {
+		infoLog = log.New(ioutil.Discard, "", 0)
+		errorLog = log.New(ioutil.Discard, "", 0)
+		debugLog = log.New(ioutil.Discard, "", 0)
+	}
+
 
 	app := &Logging{
 		errorLog: errorLog,

@@ -24,7 +24,7 @@ func NewGitlabAPIClient() *GitlabAPIClient {
 		GitlabAPIToken:   viper.GetString("api_token"),
 		GitlabProjectURL: viper.GetString("url"),
 		ProjectID:        viper.GetString("project_id"),
-		Logging:          NewLogging(),
+		Logging:          NewLogging(false),
 	}
 }
 
