@@ -33,7 +33,7 @@ func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *GitlabAPIClie
 	var enrichedPipelines []*models.Pipeline
 
 	if withUser {
-		enrichedPipelines, err = apiClient.enrichPipelinesByUser(pipelines)
+		enrichedPipelines, err = apiClient.enrichPipelinesByUser(pipelines, 10)
 		pipelines = enrichedPipelines
 	}
 

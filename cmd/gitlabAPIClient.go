@@ -94,15 +94,50 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, count int) ([
 	return pipelines, nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByUser(pipelines []*models.Pipeline) ([]*models.Pipeline, error) {
-	var enrichedPipelines []*models.Pipeline
-	for _, p := range pipelines {
-		enriched, err := gitlabAPIClient.getPipeline(p.Id)
-		if err != nil {
-			return nil, err
-		}
-		enrichedPipelines = append(enrichedPipelines, enriched)
+type enrichedPipelineResult struct {
+	index    int
+	pipeline *models.Pipeline
+	err      error
+}
+
+func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByUser(pipelines []*models.Pipeline, concurrencyLimit int) ([]*models.Pipeline, error) {
+
+	semaphoreChan := make(chan struct{}, concurrencyLimit)
+	enrichedPiplineChan := make(chan *enrichedPipelineResult)
+
+	defer func() {
+		close(semaphoreChan)
+		close(enrichedPiplineChan)
+	}()
+
+	for i, pipeline := range pipelines {
+		go func(i int, pipeline *models.Pipeline) {
+			semaphoreChan <- struct{}{}
+			enrichedPipeline, err := gitlabAPIClient.getPipeline(pipeline.Id)
+			enrichedPipelineResult := &enrichedPipelineResult{i, enrichedPipeline, err}
+			enrichedPiplineChan <- enrichedPipelineResult
+			<-semaphoreChan
+		}(i, pipeline)
 	}
+
+	var enrichedPipelineResults []enrichedPipelineResult
+	for {
+		enrichedPipeline := <-enrichedPiplineChan
+		enrichedPipelineResults = append(enrichedPipelineResults, *enrichedPipeline)
+		if len(enrichedPipelineResults) == len(pipelines) {
+			break
+		}
+	}
+	var enrichedPipelines []*models.Pipeline
+
+	sort.Slice(enrichedPipelineResults, func(i, j int) bool {
+		return enrichedPipelineResults[i].index < enrichedPipelineResults[j].index
+	})
+
+	for _, e := range enrichedPipelineResults {
+		enrichedPipelines = append(enrichedPipelines, e.pipeline)
+	}
+
 	return enrichedPipelines, nil
 }
 
