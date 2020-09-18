@@ -19,11 +19,14 @@ type GitlabAPIClient struct {
 }
 
 func NewGitlabAPIClient() *GitlabAPIClient {
+
+	loggingEnabled := viper.GetBool("logging_enabled")
+
 	return &GitlabAPIClient{
 		GitlabAPIToken:   viper.GetString("api_token"),
 		GitlabProjectURL: viper.GetString("url"),
 		ProjectID:        viper.GetString("project_id"),
-		Logging:          NewLogging(true),
+		Logging:          NewLogging(loggingEnabled),
 	}
 }
 
