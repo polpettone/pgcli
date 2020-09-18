@@ -38,7 +38,7 @@ func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *GitlabAPIClie
 	}
 
 	if withCommitTitle {
-		enrichedPipelines, err = apiClient.enrichPipelinesByJobs(pipelines)
+		enrichedPipelines, err = apiClient.enrichPipelinesByJobs(pipelines, 10)
 		pipelines = enrichedPipelines
 	}
 

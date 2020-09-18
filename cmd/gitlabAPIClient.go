@@ -100,6 +100,7 @@ type enrichedPipelineResult struct {
 	err      error
 }
 
+//TODO: needs refactoring
 func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByUser(pipelines []*models.Pipeline, concurrencyLimit int) ([]*models.Pipeline, error) {
 
 	semaphoreChan := make(chan struct{}, concurrencyLimit)
@@ -141,15 +142,49 @@ func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByUser(pipelines []*models
 	return enrichedPipelines, nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByJobs(pipelines []*models.Pipeline) ([]*models.Pipeline, error) {
-	for _, p := range pipelines {
-		jobs, err := gitlabAPIClient.getJobs(strconv.Itoa(p.Id))
-		if err != nil {
-			return nil, err
-		}
-		p.Jobs = jobs
+//TODO: needs refactoring
+func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByJobs(pipelines []*models.Pipeline, concurrencyLimit int) ([]*models.Pipeline, error) {
+
+	semaphoreChan := make(chan struct{}, concurrencyLimit)
+	enrichedPiplineChan := make(chan *enrichedPipelineResult)
+
+	defer func() {
+		close(semaphoreChan)
+		close(enrichedPiplineChan)
+	}()
+
+
+	for i, pipeline := range pipelines {
+
+		go func(i int, pipeline *models.Pipeline) {
+			semaphoreChan <- struct{}{}
+			jobs, err := gitlabAPIClient.getJobs(strconv.Itoa(pipeline.Id))
+			pipeline.Jobs = jobs
+			enrichedPipelineResult := &enrichedPipelineResult{i, pipeline, err}
+			enrichedPiplineChan <- enrichedPipelineResult
+			<- semaphoreChan
+		}(i, pipeline)
 	}
-	return pipelines, nil
+
+	var enrichedPipelineResults []enrichedPipelineResult
+	for {
+		enrichedPipeline := <-enrichedPiplineChan
+		enrichedPipelineResults = append(enrichedPipelineResults, *enrichedPipeline)
+		if len(enrichedPipelineResults) == len(pipelines) {
+			break
+		}
+	}
+	var enrichedPipelines []*models.Pipeline
+
+	sort.Slice(enrichedPipelineResults, func(i, j int) bool {
+		return enrichedPipelineResults[i].index < enrichedPipelineResults[j].index
+	})
+
+	for _, e := range enrichedPipelineResults {
+		enrichedPipelines = append(enrichedPipelines, e.pipeline)
+	}
+
+	return enrichedPipelines, nil
 }
 
 func (gitlabAPIClient GitlabAPIClient) getPipeline(id int) (*models.Pipeline, error) {
