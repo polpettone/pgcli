@@ -23,7 +23,7 @@ func NewGitlabAPIClient() *GitlabAPIClient {
 		GitlabAPIToken:   viper.GetString("api_token"),
 		GitlabProjectURL: viper.GetString("url"),
 		ProjectID:        viper.GetString("project_id"),
-		Logging:          NewLogging(false),
+		Logging:          NewLogging(true),
 	}
 }
 
@@ -38,7 +38,10 @@ func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]models.Job
 
 	req.Header.Set("PRIVATE-TOKEN", gitlabAPIClient.GitlabAPIToken)
 	client := &http.Client{Timeout: time.Second * 5}
+
+	gitlabAPIClient.Logging.debugLog.Printf("%v", req)
 	resp, err := client.Do(req)
+	gitlabAPIClient.Logging.debugLog.Printf("%v", resp)
 
 	if err != nil {
 		return nil, err
@@ -74,7 +77,12 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, count int) ([
 
 	req.Header.Set("PRIVATE-TOKEN", gitlabAPIClient.GitlabAPIToken)
 	client := &http.Client{Timeout: time.Second * 5}
+
+	gitlabAPIClient.Logging.debugLog.Printf("%v", req)
+
 	resp, err := client.Do(req)
+
+	gitlabAPIClient.Logging.debugLog.Printf("%v", resp)
 
 	if err != nil {
 		return nil, err
@@ -197,7 +205,10 @@ func (gitlabAPIClient GitlabAPIClient) getPipeline(id int) (*models.Pipeline, er
 
 	req.Header.Set("PRIVATE-TOKEN", gitlabAPIClient.GitlabAPIToken)
 	client := &http.Client{Timeout: time.Second * 5}
+
+	gitlabAPIClient.Logging.debugLog.Printf("%v", req)
 	resp, err := client.Do(req)
+	gitlabAPIClient.Logging.debugLog.Printf("%v", resp)
 
 	if err != nil {
 		return nil, err
