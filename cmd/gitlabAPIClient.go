@@ -11,7 +11,6 @@ import (
 	"time"
 )
 
-
 type GitlabAPIClient struct {
 	GitlabAPIToken   string
 	GitlabProjectURL string
@@ -60,17 +59,14 @@ func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]models.Job
 	return *jobs, nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool, count int, withCommitTitle bool) ([]*models.Pipeline, error) {
-
+func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, count int) ([]*models.Pipeline, error) {
 	pipelineCount := strconv.Itoa(count)
-
 	var url string
 	if status == "" {
 		url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?order_by=updated_at&per_page=" + pipelineCount
 	} else {
 		url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines?order_by=updated_at&per_page=" + pipelineCount + "&status=" + status
 	}
-
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -95,29 +91,29 @@ func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, withUser bool
 	if err != nil {
 		return nil, err
 	}
+	return pipelines, nil
+}
 
-	if withUser {
-		var enrichedPipelines []*models.Pipeline
-		for _, p := range pipelines {
-			enriched, err := gitlabAPIClient.getPipeline(p.Id)
-			if err != nil {
-				return nil, err
-			}
-			enrichedPipelines = append(enrichedPipelines, enriched)
+func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByUser(pipelines []*models.Pipeline) ([]*models.Pipeline, error) {
+	var enrichedPipelines []*models.Pipeline
+	for _, p := range pipelines {
+		enriched, err := gitlabAPIClient.getPipeline(p.Id)
+		if err != nil {
+			return nil, err
 		}
-		pipelines = enrichedPipelines
+		enrichedPipelines = append(enrichedPipelines, enriched)
 	}
+	return enrichedPipelines, nil
+}
 
-	if withCommitTitle {
-		for _, p := range pipelines {
-			jobs, err := gitlabAPIClient.getJobs(strconv.Itoa(p.Id))
-			if err != nil {
-				return nil, err
-			}
-			p.Jobs = jobs
+func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByJobs(pipelines []*models.Pipeline) ([]*models.Pipeline, error) {
+	for _, p := range pipelines {
+		jobs, err := gitlabAPIClient.getJobs(strconv.Itoa(p.Id))
+		if err != nil {
+			return nil, err
 		}
+		p.Jobs = jobs
 	}
-
 	return pipelines, nil
 }
 
@@ -179,7 +175,7 @@ func (gitlabAPIClient GitlabAPIClient) getLog(jobID string) (string, error) {
 
 func (gitlabAPIClient GitlabAPIClient) getLastFailLog() (string, error) {
 
-	pipelines, err := gitlabAPIClient.getPipelines("failed", false, 20, false)
+	pipelines, err := gitlabAPIClient.getPipelines("failed", 20)
 	if err != nil {
 		return "", err
 	}

@@ -24,7 +24,7 @@ func NewReportCmd(apiClient *GitlabAPIClient) *cobra.Command{
 func handleReportCommand(cobraCommand *cobra.Command, apiClient *GitlabAPIClient) (string, error) {
 	allStatus := ""
 
-	pipelines, err := apiClient.getPipelines(allStatus, false, 20, false)
+	pipelines, err := apiClient.getPipelines(allStatus, 20)
 
 	if err != nil {
 		return "", err

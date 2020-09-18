@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/polpettone/pgcli/cmd/models"
 	"github.com/spf13/cobra"
 )
 
@@ -23,10 +24,24 @@ func NewPipelinesCmd(apiClient *GitlabAPIClient) *cobra.Command{
 
 func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *GitlabAPIClient) (string, error) {
 	status, _  := cobraCommand.Flags().GetString("status")
-	withUser, _ := cobraCommand.Flags().GetBool("user")
 	count, _ := cobraCommand.Flags().GetInt("count")
+	withUser, _ := cobraCommand.Flags().GetBool("user")
 	withCommitTitle, _ := cobraCommand.Flags().GetBool("commit-title")
-	pipelines, err := apiClient.getPipelines(status, withUser, count, withCommitTitle)
+
+	pipelines, err := apiClient.getPipelines(status, count)
+
+	var enrichedPipelines []*models.Pipeline
+
+	if withUser {
+		enrichedPipelines, err = apiClient.enrichPipelinesByUser(pipelines)
+		pipelines = enrichedPipelines
+	}
+
+	if withCommitTitle {
+		enrichedPipelines, err = apiClient.enrichPipelinesByJobs(pipelines)
+		pipelines = enrichedPipelines
+	}
+
 	if err != nil {
 		return "", err
 	}

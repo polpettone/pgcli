@@ -30,7 +30,7 @@ func NewJobsCmd(apiClient *GitlabAPIClient) *cobra.Command{
 }
 
 func getPipelineSuggestions(apiClient *GitlabAPIClient) []string {
-	pipelines, _ := apiClient.getPipelines("", false, 20, false)
+	pipelines, _ := apiClient.getPipelines("",  20)
 	var pipelineIds []string
 	for _, p := range pipelines[:5] {
 		pipelineIds = append(pipelineIds, strconv.Itoa(p.Id))
@@ -43,7 +43,7 @@ func handleJobsCommand(args []string, apiClient *GitlabAPIClient) (string, error
 	var pipelineId string
 
 	if len(args) < 1 || args[0] == "" {
-		pipelines, _ := apiClient.getPipelines("", false, 20, false)
+		pipelines, _ := apiClient.getPipelines("",  20)
 		pipeline , _ :=  showPipelineSelectionPrompt(pipelines)
 		pipelineId = strconv.Itoa(pipeline.Id)
 	} else {
