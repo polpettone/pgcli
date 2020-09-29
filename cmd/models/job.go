@@ -23,6 +23,7 @@ type Job struct {
 	Duration   float64
 	Name       string
 	Commit	   Commit `json:"commit"`
+	Stage	   string `json:"stage"`
 }
 
 

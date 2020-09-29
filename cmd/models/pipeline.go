@@ -3,11 +3,13 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"time"
 )
 
 func NewPipeline(pipeline Pipeline) *Pipeline {
 	duration := pipeline.UpdatedAt.Sub(pipeline.CreatedAt)
+
 	return &Pipeline{
 		Id:           pipeline.Id,
 		Status:       pipeline.Status,
@@ -18,10 +20,34 @@ func NewPipeline(pipeline Pipeline) *Pipeline {
 	}
 }
 
+func (p Pipeline) CalcNettoDuration() time.Duration {
+	var durationInSeconds float64
+
+	stages := make(map[string][]Job)
+
+	for _, job := range p.Jobs {
+		_, found := stages[job.Stage]
+		if found {
+			stages[job.Stage] = append(stages[job.Stage], job)
+		} else {
+			stages[job.Stage] = []Job{job}
+		}
+	}
+
+	for _, jobs := range stages {
+		sort.Slice(jobs[:], func(i, j int) bool {
+			return jobs[i].Duration > jobs[j].Duration
+		})
+		durationInSeconds += jobs[0].Duration
+	}
+
+	return time.Duration(durationInSeconds) * time.Second
+}
+
 func (p Pipeline) NiceString() string {
 	if len(p.Jobs) > 0 {
-		return fmt.Sprintf("%d \t %s \t %s \t %s \t %s \t %s \t%s",
-			p.Id, p.Status, p.CreatedAt, p.UpdatedAt, p.Duration, p.PipelineUser.UserName, p.Jobs[0].Commit.Title)
+		return fmt.Sprintf("%d \t %s \t %s \t %s \t %s \t %s \t %s \t%s",
+			p.Id, p.Status, p.CreatedAt, p.UpdatedAt, p.Duration, p.CalcNettoDuration(), p.PipelineUser.UserName, p.Jobs[0].Commit.Title)
 	}
 
 	return fmt.Sprintf("%d \t %s \t %s \t %s \t %s \t %s",
@@ -55,13 +81,14 @@ func ConvertJsonToPipelines(jsonData []byte) ([]*Pipeline, error) {
 }
 
 type Pipeline struct {
-	Id           int `json:"id"`
-	Status       string
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-	Duration     time.Duration
-	PipelineUser PipelineUser `json:"user"`
-	Jobs 		 []Job
+	Id            int `json:"id"`
+	Status        string
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+	Duration      time.Duration
+	NettoDuration time.Duration
+	PipelineUser  PipelineUser `json:"user"`
+	Jobs          []Job
 }
 
 type PipelineUser struct {
