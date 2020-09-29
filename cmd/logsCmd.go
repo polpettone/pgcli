@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"os"
 	"strconv"
 )
 
@@ -24,6 +25,7 @@ func NewLogsCmd(apiClient *GitlabAPIClient) *cobra.Command {
 
 func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient *GitlabAPIClient) (string, error) {
 	lastFailed, _ := cobraCommand.Flags().GetBool("lastFailed")
+	toFile, _ := cobraCommand.Flags().GetString("toFile")
 
 	var jobID string
 
@@ -37,24 +39,68 @@ func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient *Gi
 		job, _ := showJobSelectionPrompt(jobs)
 		jobID = strconv.Itoa(job.Id)
 
+		if toFile != "" {
+			log, err := apiClient.getLog(jobID)
+			if err != nil {
+				return "", err
+			}
+			err = writeToFile(log, toFile)
+			if err != nil {
+				return "", err
+			}
+			return "Written to " + toFile, nil
+		}
+
 		return apiClient.getLog(jobID)
 	} else {
-
+		var log string
+		var err error
 		if lastFailed {
-			return apiClient.getLastFailLog()
+			log, err =  apiClient.getLastFailLog()
 		} else {
 			jobID = args[0]
-			return apiClient.getLog(jobID)
+			log, err = apiClient.getLog(jobID)
 		}
+
+		if toFile != "" {
+			if err != nil {
+				return "", err
+			}
+			err = writeToFile(log, toFile)
+			if err != nil {
+				return "", err
+			}
+			return "Written to " + toFile, nil
+		}
+
+		return log, err
 	}
 }
 
 func init() {
 	logsCmd := NewLogsCmd(NewGitlabAPIClient())
 	rootCmd.AddCommand(logsCmd)
+
 	logsCmd.Flags().BoolP(
 		"lastFailed",
 		"l",
 		false,
 		"Shows the logs from the last failed job")
+
+	logsCmd.Flags().StringP(
+		"toFile",
+		"t",
+		"",
+		"Writes the logs to the given file")
+
+}
+
+func writeToFile(content string, path string) error {
+	f, err := os.OpenFile(path, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = f.Write([]byte(content))
+	return err
 }
