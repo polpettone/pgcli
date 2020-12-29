@@ -125,7 +125,7 @@ func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByUser(pipelines []*models
 	for i, pipeline := range pipelines {
 		go func(i int, pipeline *models.Pipeline) {
 			semaphoreChan <- struct{}{}
-			enrichedPipeline, err := gitlabAPIClient.getPipeline(pipeline.Id)
+			enrichedPipeline, err := gitlabAPIClient.getPipeline(strconv.Itoa(pipeline.Id))
 			enrichedPipelineResult := &enrichedPipelineResult{i, enrichedPipeline, err}
 			enrichedPiplineChan <- enrichedPipelineResult
 			<-semaphoreChan
@@ -198,8 +198,8 @@ func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByJobs(pipelines []*models
 	return enrichedPipelines, nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) getPipeline(id int) (*models.Pipeline, error) {
-	url := gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines" + "/" + strconv.Itoa(id)
+func (gitlabAPIClient GitlabAPIClient) getPipeline(id string) (*models.Pipeline, error) {
+	url := gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines" + "/" + id
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

@@ -36,6 +36,12 @@ func (job Job) NiceString() string {
 }
 
 
+func (job Job) View() string {
+	output := fmt.Sprintf("%s \t %s \t %s", job.Name, job.Status, job.Commit.Title)
+	return output
+}
+
+
 func ConvertJsonToJobs(jsonData []byte) (*[]Job, error) {
 	jobs := make([]Job, 0)
 	err := json.Unmarshal(jsonData, &jobs)
