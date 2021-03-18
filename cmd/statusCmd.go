@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func StatusCmd(apiClient *GitlabAPIClient) *cobra.Command{
+func StatusCmd(apiClient *GitlabAPIClient) *cobra.Command {
 	return &cobra.Command{
 		Use:   "status <pipelineID>",
 		Short: "shows the status of the pipeline",
@@ -23,17 +23,15 @@ func StatusCmd(apiClient *GitlabAPIClient) *cobra.Command{
 	}
 }
 
-func handleStatusCommand(args []string, apiClient *GitlabAPIClient)  error {
+func handleStatusCommand(args []string, apiClient *GitlabAPIClient) error {
 	var pipelineId string
 	if len(args) < 1 || args[0] == "" {
-		pipelines, _ := apiClient.getPipelines("",  10)
-		pipeline , _ :=  showPipelineSelectionPrompt(pipelines)
+		pipelines, _ := apiClient.getPipelines("", 10)
+		pipeline, _ := showPipelineSelectionPrompt(pipelines)
 		pipelineId = strconv.Itoa(pipeline.Id)
 	} else {
 		pipelineId = args[0]
 	}
-
-
 
 	jobs, err := apiClient.getJobs(pipelineId)
 	if err != nil {
@@ -45,14 +43,13 @@ func handleStatusCommand(args []string, apiClient *GitlabAPIClient)  error {
 		value = value + "\n" + job.View()
 	}
 
-
 	var data [][]string
 	for _, job := range jobs {
 		data = append(data, []string{
 			job.Name,
 			job.Status,
 			job.StartedAt.Format("02.01.2006 15:04:05"),
-			job.FinishedAt.Format("02.01.2006 15:04:05"),})
+			job.FinishedAt.Format("02.01.2006 15:04:05")})
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
@@ -75,12 +72,12 @@ func handleStatusCommand(args []string, apiClient *GitlabAPIClient)  error {
 	}
 	enrichedPipeline := enrichedPipelines[0]
 
-	pipelineSummary := fmt.Sprintf("%s \n" +
-		"%s \t %s \n" +
-		"%s \t %s \n" +
-		"%s \t %s \n" +
-		"%s \t %s \n" +
-		"%s \t %s \n" +
+	pipelineSummary := fmt.Sprintf("%s \n"+
+		"%s \t %s \n"+
+		"%s \t %s \n"+
+		"%s \t %s \n"+
+		"%s \t %s \n"+
+		"%s \t %s \n"+
 		"%s \t %f \n",
 		"Pipeline Summary",
 		"Status:", enrichedPipeline.Status,
@@ -94,7 +91,7 @@ func handleStatusCommand(args []string, apiClient *GitlabAPIClient)  error {
 
 	table.Render()
 
-	return  nil
+	return nil
 }
 
 func init() {

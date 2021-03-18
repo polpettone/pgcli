@@ -19,8 +19,6 @@ import (
 	"github.com/polpettone/pgcli/cmd"
 )
 
-
-
 func main() {
 	cmd.Execute()
 }
