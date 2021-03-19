@@ -60,10 +60,9 @@ func InitConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".pgcli" (without extension).
-		viper.AddConfigPath(home)
+		viper.AddConfigPath(home + "/.config/pgcli")
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".pgcli")
+		viper.SetConfigName("conf")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
