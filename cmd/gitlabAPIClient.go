@@ -30,6 +30,42 @@ func NewGitlabAPIClient() *GitlabAPIClient {
 	}
 }
 
+func (gitlabAPIClient *GitlabAPIClient) getProjects() ([]models.Project, error) {
+
+	var url = "https://gitlab.com/api/v4/groups/6192951/projects/?membership=true&simple=true&per_page=30&include_subgroups=true"
+	req, err := http.NewRequest("GET", url, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("PRIVATE-TOKEN", gitlabAPIClient.GitlabAPIToken)
+	client := &http.Client{Timeout: time.Second * 5}
+
+	gitlabAPIClient.Logging.debugLog.Printf("%v", req)
+	resp, err := client.Do(req)
+	gitlabAPIClient.Logging.debugLog.Printf("%v", resp)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	projects, err := models.ConvertJsonToProjects(body)
+	if err != nil {
+		return nil, err
+	}
+
+	return *projects, err
+}
+
 func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]models.Job, error) {
 
 	var url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines/" + pipelineId + "/jobs"
@@ -164,7 +200,6 @@ func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByJobs(pipelines []*models
 		close(enrichedPiplineChan)
 	}()
 
-
 	for i, pipeline := range pipelines {
 
 		go func(i int, pipeline *models.Pipeline) {
@@ -173,7 +208,7 @@ func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByJobs(pipelines []*models
 			pipeline.Jobs = jobs
 			enrichedPipelineResult := &enrichedPipelineResult{i, pipeline, err}
 			enrichedPiplineChan <- enrichedPipelineResult
-			<- semaphoreChan
+			<-semaphoreChan
 		}(i, pipeline)
 	}
 

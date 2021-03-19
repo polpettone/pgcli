@@ -11,17 +11,17 @@ func ProjectCmd(apiClient *GitlabAPIClient) *cobra.Command {
 		Use:   "project",
 		Short: "",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := handleProjectCommand(args, apiClient)
+			stdout, err := handleProjectCommand(args, apiClient)
 			if err != nil {
 				return err
 			}
+			fmt.Println(stdout)
 			return nil
 		},
 	}
 }
 
-func handleProjectCommand(args []string, apiClient *GitlabAPIClient) error {
-
+func tryConfigWrite() {
 	projects := viper.GetStringSlice("projects")
 	fmt.Println("Projects")
 	fmt.Println(projects)
@@ -45,13 +45,26 @@ func handleProjectCommand(args []string, apiClient *GitlabAPIClient) error {
 	fmt.Println(foo)
 
 	viper.WriteConfig()
+}
 
-	return nil
+func handleProjectCommand(args []string, apiClient *GitlabAPIClient) (string, error) {
+
+	projects, err := apiClient.getProjects()
+
+	if err != nil {
+		return "", nil
+	}
+
+	value := ""
+	for _, project := range projects {
+		value = value + "\n" + project.NiceString()
+	}
+
+	return value, nil
 }
 
 func init() {
 	initConfig()
 	projectCmd := ProjectCmd(NewGitlabAPIClient())
-
 	rootCmd.AddCommand(projectCmd)
 }
