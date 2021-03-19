@@ -7,9 +7,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-func ProjectCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
+func ProjectsCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
 	return &cobra.Command{
-		Use:   "project",
+		Use:   "projects",
 		Short: "",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			stdout, err := handleProjectCommand(args, apiClient)
@@ -66,6 +66,6 @@ func handleProjectCommand(args []string, apiClient *adapter.GitlabAPIClient) (st
 
 func init() {
 	InitConfig()
-	projectCmd := ProjectCmd(adapter.NewGitlabAPIClient())
+	projectCmd := ProjectsCmd(adapter.NewGitlabAPIClient())
 	rootCmd.AddCommand(projectCmd)
 }
