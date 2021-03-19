@@ -13,7 +13,7 @@ func NewPipelinesCmd(apiClient *GitlabAPIClient) *cobra.Command{
 		Long:  "shows the last 5 Pipelines",
 		Run: func(cmd *cobra.Command, args []string) {
 			stdout, err := handlePipelineCommand(cmd, apiClient)
-			apiClient.Logging.infoLog.Printf("Pipeline Command Called")
+			apiClient.Logging.InfoLog.Printf("Pipeline Command Called")
 			if err != nil {
 				fmt.Println(err)
 			}

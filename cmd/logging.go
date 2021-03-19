@@ -11,9 +11,9 @@ func init() {
 }
 
 type Logging struct {
-	errorLog      *log.Logger
-	infoLog       *log.Logger
-	debugLog      *log.Logger
+	ErrorLog *log.Logger
+	InfoLog  *log.Logger
+	DebugLog *log.Logger
 }
 
 func NewLogging(enabled bool) *Logging {
@@ -34,9 +34,9 @@ func NewLogging(enabled bool) *Logging {
 
 
 	app := &Logging{
-		errorLog: errorLog,
-		infoLog: infoLog,
-		debugLog: debugLog,
+		ErrorLog: errorLog,
+		InfoLog:  infoLog,
+		DebugLog: debugLog,
 	}
 
 	return app
