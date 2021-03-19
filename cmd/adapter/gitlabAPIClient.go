@@ -1,7 +1,8 @@
-package cmd
+package adapter
 
 import (
 	"fmt"
+	"github.com/polpettone/pgcli/cmd/config"
 	"github.com/polpettone/pgcli/cmd/models"
 	"github.com/spf13/viper"
 	"io/ioutil"
@@ -15,7 +16,7 @@ type GitlabAPIClient struct {
 	GitlabAPIToken   string
 	GitlabProjectURL string
 	ProjectID        string
-	Logging          *Logging
+	Logging          *config.Logging
 }
 
 func NewGitlabAPIClient() *GitlabAPIClient {
@@ -26,11 +27,11 @@ func NewGitlabAPIClient() *GitlabAPIClient {
 		GitlabAPIToken:   viper.GetString("api_token"),
 		GitlabProjectURL: viper.GetString("url"),
 		ProjectID:        viper.GetString("project_id"),
-		Logging:          NewLogging(loggingEnabled),
+		Logging:          config.NewLogging(loggingEnabled),
 	}
 }
 
-func (gitlabAPIClient *GitlabAPIClient) getProjects() ([]models.Project, error) {
+func (gitlabAPIClient *GitlabAPIClient) GetProjects() ([]models.Project, error) {
 
 	var url = "https://gitlab.com/api/v4/groups/6192951/projects/?membership=true&simple=true&per_page=30&include_subgroups=true"
 	req, err := http.NewRequest("GET", url, nil)
@@ -66,7 +67,7 @@ func (gitlabAPIClient *GitlabAPIClient) getProjects() ([]models.Project, error) 
 	return *projects, err
 }
 
-func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]models.Job, error) {
+func (gitlabAPIClient *GitlabAPIClient) GetJobs(pipelineId string) ([]models.Job, error) {
 
 	var url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines/" + pipelineId + "/jobs"
 	req, err := http.NewRequest("GET", url, nil)
@@ -101,7 +102,7 @@ func (gitlabAPIClient *GitlabAPIClient) getJobs(pipelineId string) ([]models.Job
 	return *jobs, nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) getPipelines(status string, count int) ([]*models.Pipeline, error) {
+func (gitlabAPIClient GitlabAPIClient) GetPipelines(status string, count int) ([]*models.Pipeline, error) {
 	pipelineCount := strconv.Itoa(count)
 	var url string
 	if status == "" {
@@ -148,7 +149,7 @@ type enrichedPipelineResult struct {
 }
 
 //TODO: needs refactoring
-func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByUser(pipelines []*models.Pipeline, concurrencyLimit int) ([]*models.Pipeline, error) {
+func (gitlabAPIClient GitlabAPIClient) EnrichPipelinesByUser(pipelines []*models.Pipeline, concurrencyLimit int) ([]*models.Pipeline, error) {
 
 	semaphoreChan := make(chan struct{}, concurrencyLimit)
 	enrichedPiplineChan := make(chan *enrichedPipelineResult)
@@ -161,7 +162,7 @@ func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByUser(pipelines []*models
 	for i, pipeline := range pipelines {
 		go func(i int, pipeline *models.Pipeline) {
 			semaphoreChan <- struct{}{}
-			enrichedPipeline, err := gitlabAPIClient.getPipeline(strconv.Itoa(pipeline.Id))
+			enrichedPipeline, err := gitlabAPIClient.GetPipeline(strconv.Itoa(pipeline.Id))
 			enrichedPipelineResult := &enrichedPipelineResult{i, enrichedPipeline, err}
 			enrichedPiplineChan <- enrichedPipelineResult
 			<-semaphoreChan
@@ -190,7 +191,7 @@ func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByUser(pipelines []*models
 }
 
 //TODO: needs refactoring
-func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByJobs(pipelines []*models.Pipeline, concurrencyLimit int) ([]*models.Pipeline, error) {
+func (gitlabAPIClient GitlabAPIClient) EnrichPipelinesByJobs(pipelines []*models.Pipeline, concurrencyLimit int) ([]*models.Pipeline, error) {
 
 	semaphoreChan := make(chan struct{}, concurrencyLimit)
 	enrichedPiplineChan := make(chan *enrichedPipelineResult)
@@ -204,7 +205,7 @@ func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByJobs(pipelines []*models
 
 		go func(i int, pipeline *models.Pipeline) {
 			semaphoreChan <- struct{}{}
-			jobs, err := gitlabAPIClient.getJobs(strconv.Itoa(pipeline.Id))
+			jobs, err := gitlabAPIClient.GetJobs(strconv.Itoa(pipeline.Id))
 			pipeline.Jobs = jobs
 			enrichedPipelineResult := &enrichedPipelineResult{i, pipeline, err}
 			enrichedPiplineChan <- enrichedPipelineResult
@@ -233,7 +234,7 @@ func (gitlabAPIClient GitlabAPIClient) enrichPipelinesByJobs(pipelines []*models
 	return enrichedPipelines, nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) getPipeline(id string) (*models.Pipeline, error) {
+func (gitlabAPIClient GitlabAPIClient) GetPipeline(id string) (*models.Pipeline, error) {
 	url := gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/pipelines" + "/" + id
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -267,7 +268,7 @@ func (gitlabAPIClient GitlabAPIClient) getPipeline(id string) (*models.Pipeline,
 	return pipeline, nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) getLog(jobID string) (string, error) {
+func (gitlabAPIClient GitlabAPIClient) GetLog(jobID string) (string, error) {
 	var url = gitlabAPIClient.GitlabProjectURL + "/" + gitlabAPIClient.ProjectID + "/jobs/" + jobID + "/trace"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -292,15 +293,15 @@ func (gitlabAPIClient GitlabAPIClient) getLog(jobID string) (string, error) {
 	return string(body), nil
 }
 
-func (gitlabAPIClient GitlabAPIClient) getLastFailLog() (string, error) {
+func (gitlabAPIClient GitlabAPIClient) GetLastFailLog() (string, error) {
 
-	pipelines, err := gitlabAPIClient.getPipelines("failed", 20)
+	pipelines, err := gitlabAPIClient.GetPipelines("failed", 20)
 	if err != nil {
 		return "", err
 	}
 
 	failedPipeline := getLastFailedPipeline(pipelines)
-	jobs, err := gitlabAPIClient.getJobs(strconv.Itoa(failedPipeline.Id))
+	jobs, err := gitlabAPIClient.GetJobs(strconv.Itoa(failedPipeline.Id))
 
 	if err != nil {
 		return "", err
@@ -308,7 +309,7 @@ func (gitlabAPIClient GitlabAPIClient) getLastFailLog() (string, error) {
 
 	failedJob := getLastFailedJob(jobs)
 
-	log, err := gitlabAPIClient.getLog(strconv.Itoa(failedJob.Id))
+	log, err := gitlabAPIClient.GetLog(strconv.Itoa(failedJob.Id))
 	if err != nil {
 		return "", err
 	}

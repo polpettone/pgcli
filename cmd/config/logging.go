@@ -1,14 +1,10 @@
-package cmd
+package config
 
 import (
 	"io/ioutil"
 	"log"
 	"os"
 )
-
-func init() {
-	initConfig()
-}
 
 type Logging struct {
 	ErrorLog *log.Logger

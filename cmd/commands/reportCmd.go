@@ -1,12 +1,13 @@
-package cmd
+package commands
 
 import (
 	"fmt"
+	"github.com/polpettone/pgcli/cmd/adapter"
 	"github.com/polpettone/pgcli/cmd/models"
 	"github.com/spf13/cobra"
 )
 
-func NewReportCmd(apiClient *GitlabAPIClient) *cobra.Command{
+func NewReportCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command{
 	return &cobra.Command{
 		Use:   "report",
 		Short: "shows a report",
@@ -21,10 +22,10 @@ func NewReportCmd(apiClient *GitlabAPIClient) *cobra.Command{
 	}
 }
 
-func handleReportCommand(cobraCommand *cobra.Command, apiClient *GitlabAPIClient) (string, error) {
+func handleReportCommand(cobraCommand *cobra.Command, apiClient *adapter.GitlabAPIClient) (string, error) {
 	allStatus := ""
 
-	pipelines, err := apiClient.getPipelines(allStatus, 20)
+	pipelines, err := apiClient.GetPipelines(allStatus, 20)
 
 	if err != nil {
 		return "", err
@@ -37,7 +38,7 @@ func handleReportCommand(cobraCommand *cobra.Command, apiClient *GitlabAPIClient
 
 
 func init() {
-	reportCmd := NewReportCmd(NewGitlabAPIClient())
+	reportCmd := NewReportCmd(adapter.NewGitlabAPIClient())
 	rootCmd.AddCommand(reportCmd)
 
 }

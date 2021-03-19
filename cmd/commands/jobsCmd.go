@@ -1,12 +1,13 @@
-package cmd
+package commands
 
 import (
 	"fmt"
+	"github.com/polpettone/pgcli/cmd/adapter"
 	"github.com/spf13/cobra"
 	"strconv"
 )
 
-func NewJobsCmd(apiClient *GitlabAPIClient) *cobra.Command{
+func NewJobsCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command{
 	return &cobra.Command{
 		Use:   "jobs <pipelineID>",
 		Short: "list the jobs of a specific pipeline",
@@ -29,8 +30,8 @@ func NewJobsCmd(apiClient *GitlabAPIClient) *cobra.Command{
 	}
 }
 
-func getPipelineSuggestions(apiClient *GitlabAPIClient) []string {
-	pipelines, _ := apiClient.getPipelines("",  20)
+func getPipelineSuggestions(apiClient *adapter.GitlabAPIClient) []string {
+	pipelines, _ := apiClient.GetPipelines("",  20)
 	var pipelineIds []string
 	for _, p := range pipelines[:5] {
 		pipelineIds = append(pipelineIds, strconv.Itoa(p.Id))
@@ -38,20 +39,20 @@ func getPipelineSuggestions(apiClient *GitlabAPIClient) []string {
 	return pipelineIds
 }
 
-func handleJobsCommand(args []string, apiClient *GitlabAPIClient) (string, error) {
+func handleJobsCommand(args []string, apiClient *adapter.GitlabAPIClient) (string, error) {
 
 	var pipelineId string
 
 	if len(args) < 1 || args[0] == "" {
-		pipelines, _ := apiClient.getPipelines("",  20)
-		pipeline , _ :=  showPipelineSelectionPrompt(pipelines)
+		pipelines, _ := apiClient.GetPipelines("",  20)
+		pipeline , _ :=  adapter.ShowPipelineSelectionPrompt(pipelines)
 		pipelineId = strconv.Itoa(pipeline.Id)
 	} else {
 		pipelineId = args[0]
 	}
 
 
-	jobs, err := apiClient.getJobs(pipelineId)
+	jobs, err := apiClient.GetJobs(pipelineId)
 	if err != nil {
 		return "", err
 	}
@@ -65,7 +66,7 @@ func handleJobsCommand(args []string, apiClient *GitlabAPIClient) (string, error
 }
 
 func init() {
-	initConfig()
-	jobsCmd := NewJobsCmd(NewGitlabAPIClient())
+	InitConfig()
+	jobsCmd := NewJobsCmd(adapter.NewGitlabAPIClient())
 	rootCmd.AddCommand(jobsCmd)
 }

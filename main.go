@@ -16,9 +16,9 @@ limitations under the License.
 package main
 
 import (
-	"github.com/polpettone/pgcli/cmd"
+	"github.com/polpettone/pgcli/cmd/commands"
 )
 
 func main() {
-	cmd.Execute()
+	commands.Execute()
 }

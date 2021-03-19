@@ -1,12 +1,13 @@
-package cmd
+package commands
 
 import (
 	"fmt"
+	"github.com/polpettone/pgcli/cmd/adapter"
 	"github.com/polpettone/pgcli/cmd/models"
 	"github.com/spf13/cobra"
 )
 
-func NewPipelinesCmd(apiClient *GitlabAPIClient) *cobra.Command{
+func NewPipelinesCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command{
 	return &cobra.Command{
 		Use:   "pipelines",
 		Short: "shows the last 5 Pipelines",
@@ -22,23 +23,23 @@ func NewPipelinesCmd(apiClient *GitlabAPIClient) *cobra.Command{
 	}
 }
 
-func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *GitlabAPIClient) (string, error) {
+func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *adapter.GitlabAPIClient) (string, error) {
 	status, _  := cobraCommand.Flags().GetString("status")
 	count, _ := cobraCommand.Flags().GetInt("count")
 	withUser, _ := cobraCommand.Flags().GetBool("user")
 	withCommitTitle, _ := cobraCommand.Flags().GetBool("commit-title")
 
-	pipelines, err := apiClient.getPipelines(status, count)
+	pipelines, err := apiClient.GetPipelines(status, count)
 
 	var enrichedPipelines []*models.Pipeline
 
 	if withUser {
-		enrichedPipelines, err = apiClient.enrichPipelinesByUser(pipelines, 10)
+		enrichedPipelines, err = apiClient.EnrichPipelinesByUser(pipelines, 10)
 		pipelines = enrichedPipelines
 	}
 
 	if withCommitTitle {
-		enrichedPipelines, err = apiClient.enrichPipelinesByJobs(pipelines, 10)
+		enrichedPipelines, err = apiClient.EnrichPipelinesByJobs(pipelines, 10)
 		pipelines = enrichedPipelines
 	}
 
@@ -54,7 +55,7 @@ func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *GitlabAPIClie
 
 
 func init() {
-	pipelinesCmd := NewPipelinesCmd(NewGitlabAPIClient())
+	pipelinesCmd := NewPipelinesCmd(adapter.NewGitlabAPIClient())
 
 	pipelinesCmd.Flags().StringP(
 		"status",

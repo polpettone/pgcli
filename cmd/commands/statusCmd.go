@@ -1,15 +1,16 @@
-package cmd
+package commands
 
 import (
 	"fmt"
 	"github.com/olekukonko/tablewriter"
+	"github.com/polpettone/pgcli/cmd/adapter"
 	"github.com/polpettone/pgcli/cmd/models"
 	"github.com/spf13/cobra"
 	"os"
 	"strconv"
 )
 
-func StatusCmd(apiClient *GitlabAPIClient) *cobra.Command {
+func StatusCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
 	return &cobra.Command{
 		Use:   "status <pipelineID>",
 		Short: "shows the status of the pipeline",
@@ -23,17 +24,17 @@ func StatusCmd(apiClient *GitlabAPIClient) *cobra.Command {
 	}
 }
 
-func handleStatusCommand(args []string, apiClient *GitlabAPIClient) error {
+func handleStatusCommand(args []string, apiClient *adapter.GitlabAPIClient) error {
 	var pipelineId string
 	if len(args) < 1 || args[0] == "" {
-		pipelines, _ := apiClient.getPipelines("", 10)
-		pipeline, _ := showPipelineSelectionPrompt(pipelines)
+		pipelines, _ := apiClient.GetPipelines("", 10)
+		pipeline, _ := adapter.ShowPipelineSelectionPrompt(pipelines)
 		pipelineId = strconv.Itoa(pipeline.Id)
 	} else {
 		pipelineId = args[0]
 	}
 
-	jobs, err := apiClient.getJobs(pipelineId)
+	jobs, err := apiClient.GetJobs(pipelineId)
 	if err != nil {
 		return err
 	}
@@ -58,14 +59,14 @@ func handleStatusCommand(args []string, apiClient *GitlabAPIClient) error {
 		table.Append(d)
 	}
 
-	pipeline, err := apiClient.getPipeline(pipelineId)
+	pipeline, err := apiClient.GetPipeline(pipelineId)
 
 	if err != nil {
 		return err
 	}
 
 	pipelines := []*models.Pipeline{pipeline}
-	enrichedPipelines, err := apiClient.enrichPipelinesByUser(pipelines, 1)
+	enrichedPipelines, err := apiClient.EnrichPipelinesByUser(pipelines, 1)
 
 	if err != nil {
 		return err
@@ -95,7 +96,7 @@ func handleStatusCommand(args []string, apiClient *GitlabAPIClient) error {
 }
 
 func init() {
-	initConfig()
-	statusCmd := StatusCmd(NewGitlabAPIClient())
+	InitConfig()
+	statusCmd := StatusCmd(adapter.NewGitlabAPIClient())
 	rootCmd.AddCommand(statusCmd)
 }

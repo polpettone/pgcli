@@ -1,4 +1,4 @@
-package cmd
+package adapter
 
 import (
 	"github.com/manifoldco/promptui"
@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func showPipelineSelectionPrompt(pipelines []*models.Pipeline) (*models.Pipeline, error) {
+func ShowPipelineSelectionPrompt(pipelines []*models.Pipeline) (*models.Pipeline, error) {
 
 	templates := &promptui.SelectTemplates{
 		Active:   "\U00001B61 {{ .Id | red }} {{ .CreatedAt | green }} {{ .UpdatedAt | green }} {{.Duration | green}} {{ .Status | green }}",
@@ -35,7 +35,7 @@ func showPipelineSelectionPrompt(pipelines []*models.Pipeline) (*models.Pipeline
 	return pipelines[i], nil
 }
 
-func showJobSelectionPrompt(jobs []models.Job) (*models.Job, error) {
+func ShowJobSelectionPrompt(jobs []models.Job) (*models.Job, error) {
 
 	templates := &promptui.SelectTemplates{
 		Active:   "\U00001B61 {{ .Status | red }} {{ .StartedAt | green }} {{ .FinishedAt | green }} {{ .Duration | green }}  {{ .Name | green }} ",

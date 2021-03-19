@@ -1,12 +1,13 @@
-package cmd
+package commands
 
 import (
 	"fmt"
+	"github.com/polpettone/pgcli/cmd/adapter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-func ProjectCmd(apiClient *GitlabAPIClient) *cobra.Command {
+func ProjectCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
 	return &cobra.Command{
 		Use:   "project",
 		Short: "",
@@ -47,9 +48,9 @@ func tryConfigWrite() {
 	viper.WriteConfig()
 }
 
-func handleProjectCommand(args []string, apiClient *GitlabAPIClient) (string, error) {
+func handleProjectCommand(args []string, apiClient *adapter.GitlabAPIClient) (string, error) {
 
-	projects, err := apiClient.getProjects()
+	projects, err := apiClient.GetProjects()
 
 	if err != nil {
 		return "", nil
@@ -64,7 +65,7 @@ func handleProjectCommand(args []string, apiClient *GitlabAPIClient) (string, er
 }
 
 func init() {
-	initConfig()
-	projectCmd := ProjectCmd(NewGitlabAPIClient())
+	InitConfig()
+	projectCmd := ProjectCmd(adapter.NewGitlabAPIClient())
 	rootCmd.AddCommand(projectCmd)
 }

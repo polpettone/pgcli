@@ -1,13 +1,14 @@
-package cmd
+package commands
 
 import (
 	"fmt"
+	"github.com/polpettone/pgcli/cmd/adapter"
 	"github.com/spf13/cobra"
 	"os"
 	"strconv"
 )
 
-func NewLogsCmd(apiClient *GitlabAPIClient) *cobra.Command {
+func NewLogsCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
 	return &cobra.Command{
 		Use:
 		"logs -> interactive mode| logs <jobID> -> logs of job | logs -l -> logs of last failed job",
@@ -23,7 +24,7 @@ func NewLogsCmd(apiClient *GitlabAPIClient) *cobra.Command {
 	}
 }
 
-func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient *GitlabAPIClient) (string, error) {
+func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient *adapter.GitlabAPIClient) (string, error) {
 	lastFailed, _ := cobraCommand.Flags().GetBool("lastFailed")
 	toFile, _ := cobraCommand.Flags().GetString("toFile")
 
@@ -31,16 +32,16 @@ func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient *Gi
 
 	if (len(args) < 1 || args[0] == "") && lastFailed == false {
 
-		pipelines, _ := apiClient.getPipelines("",  20)
-		pipeline, _ := showPipelineSelectionPrompt(pipelines)
+		pipelines, _ := apiClient.GetPipelines("",  20)
+		pipeline, _ := adapter.ShowPipelineSelectionPrompt(pipelines)
 		pipelineId := strconv.Itoa(pipeline.Id)
 
-		jobs, _ := apiClient.getJobs(pipelineId)
-		job, _ := showJobSelectionPrompt(jobs)
+		jobs, _ := apiClient.GetJobs(pipelineId)
+		job, _ := adapter.ShowJobSelectionPrompt(jobs)
 		jobID = strconv.Itoa(job.Id)
 
 		if toFile != "" {
-			log, err := apiClient.getLog(jobID)
+			log, err := apiClient.GetLog(jobID)
 			if err != nil {
 				return "", err
 			}
@@ -51,15 +52,15 @@ func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient *Gi
 			return "Written to " + toFile, nil
 		}
 
-		return apiClient.getLog(jobID)
+		return apiClient.GetLog(jobID)
 	} else {
 		var log string
 		var err error
 		if lastFailed {
-			log, err =  apiClient.getLastFailLog()
+			log, err =  apiClient.GetLastFailLog()
 		} else {
 			jobID = args[0]
-			log, err = apiClient.getLog(jobID)
+			log, err = apiClient.GetLog(jobID)
 		}
 
 		if toFile != "" {
@@ -78,7 +79,7 @@ func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient *Gi
 }
 
 func init() {
-	logsCmd := NewLogsCmd(NewGitlabAPIClient())
+	logsCmd := NewLogsCmd(adapter.NewGitlabAPIClient())
 	rootCmd.AddCommand(logsCmd)
 
 	logsCmd.Flags().BoolP(
