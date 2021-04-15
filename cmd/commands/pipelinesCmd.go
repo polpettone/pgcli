@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewPipelinesCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command{
+func NewPipelinesCmd(apiClient *adapter.App) *cobra.Command{
 	return &cobra.Command{
 		Use:   "pipelines",
 		Short: "shows the last 5 Pipelines",
@@ -23,7 +23,7 @@ func NewPipelinesCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command{
 	}
 }
 
-func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *adapter.GitlabAPIClient) (string, error) {
+func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *adapter.App) (string, error) {
 
 
 
@@ -59,7 +59,7 @@ func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *adapter.Gitla
 
 
 func init() {
-	pipelinesCmd := NewPipelinesCmd(adapter.NewGitlabAPIClient())
+	pipelinesCmd := NewPipelinesCmd(adapter.NewApp())
 
 	pipelinesCmd.Flags().StringP(
 		"status",

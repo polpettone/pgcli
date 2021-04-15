@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func NewLogsCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
+func NewLogsCmd(apiClient *adapter.App) *cobra.Command {
 	return &cobra.Command{
 		Use:
 		"logs -> interactive mode| logs <jobID> -> logs of job | logs -l -> logs of last failed job",
@@ -24,7 +24,7 @@ func NewLogsCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
 	}
 }
 
-func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient *adapter.GitlabAPIClient) (string, error) {
+func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient *adapter.App) (string, error) {
 	lastFailed, _ := cobraCommand.Flags().GetBool("lastFailed")
 	toFile, _ := cobraCommand.Flags().GetString("toFile")
 
@@ -79,7 +79,7 @@ func handleLogsCommand(cobraCommand *cobra.Command, args []string, apiClient *ad
 }
 
 func init() {
-	logsCmd := NewLogsCmd(adapter.NewGitlabAPIClient())
+	logsCmd := NewLogsCmd(adapter.NewApp())
 	rootCmd.AddCommand(logsCmd)
 
 	logsCmd.Flags().BoolP(

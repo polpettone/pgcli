@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func StatusCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
+func StatusCmd(apiClient *adapter.App) *cobra.Command {
 	return &cobra.Command{
 		Use:   "status <pipelineID>",
 		Short: "shows the status of the pipeline",
@@ -24,7 +24,7 @@ func StatusCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
 	}
 }
 
-func handleStatusCommand(args []string, apiClient *adapter.GitlabAPIClient) error {
+func handleStatusCommand(args []string, apiClient *adapter.App) error {
 	var pipelineId string
 	if len(args) < 1 || args[0] == "" {
 		pipelines, _ := apiClient.GetPipelines("", 10)
@@ -97,6 +97,6 @@ func handleStatusCommand(args []string, apiClient *adapter.GitlabAPIClient) erro
 
 func init() {
 	InitConfig()
-	statusCmd := StatusCmd(adapter.NewGitlabAPIClient())
+	statusCmd := StatusCmd(adapter.NewApp())
 	rootCmd.AddCommand(statusCmd)
 }

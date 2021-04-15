@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewReportCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command{
+func NewReportCmd(apiClient *adapter.App) *cobra.Command{
 	return &cobra.Command{
 		Use:   "report",
 		Short: "shows a report",
@@ -22,7 +22,7 @@ func NewReportCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command{
 	}
 }
 
-func handleReportCommand(cobraCommand *cobra.Command, apiClient *adapter.GitlabAPIClient) (string, error) {
+func handleReportCommand(cobraCommand *cobra.Command, apiClient *adapter.App) (string, error) {
 	allStatus := ""
 
 	pipelines, err := apiClient.GetPipelines(allStatus, 20)
@@ -38,7 +38,7 @@ func handleReportCommand(cobraCommand *cobra.Command, apiClient *adapter.GitlabA
 
 
 func init() {
-	reportCmd := NewReportCmd(adapter.NewGitlabAPIClient())
+	reportCmd := NewReportCmd(adapter.NewApp())
 	rootCmd.AddCommand(reportCmd)
 
 }

@@ -9,11 +9,11 @@ import (
 
 func init() {
 	InitConfig()
-	projectCmd := ProjectsCmd(adapter.NewGitlabAPIClient())
+	projectCmd := ProjectsCmd(adapter.NewApp())
 	rootCmd.AddCommand(projectCmd)
 }
 
-func ProjectsCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
+func ProjectsCmd(apiClient *adapter.App) *cobra.Command {
 	return &cobra.Command{
 		Use:   "projects",
 		Short: "",
@@ -28,7 +28,7 @@ func ProjectsCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
 	}
 }
 
-func handleProjectCommand(args []string, apiClient *adapter.GitlabAPIClient) (string, error) {
+func handleProjectCommand(args []string, apiClient *adapter.App) (string, error) {
 	if len(args) == 0 {
 		return getProjects(apiClient)
 	}
@@ -50,7 +50,7 @@ func handleProjectCommand(args []string, apiClient *adapter.GitlabAPIClient) (st
 
 
 
-func getProjects(apiClient *adapter.GitlabAPIClient) (string, error) {
+func getProjects(apiClient *adapter.App) (string, error) {
 	projects, err := apiClient.GetProjects()
 	if err != nil {
 		return "", nil

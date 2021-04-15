@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func NewJobsCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command{
+func NewJobsCmd(apiClient *adapter.App) *cobra.Command{
 	return &cobra.Command{
 		Use:   "jobs <pipelineID>",
 		Short: "list the jobs of a specific pipeline",
@@ -30,7 +30,7 @@ func NewJobsCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command{
 	}
 }
 
-func getPipelineSuggestions(apiClient *adapter.GitlabAPIClient) []string {
+func getPipelineSuggestions(apiClient *adapter.App) []string {
 	pipelines, _ := apiClient.GetPipelines("",  20)
 	var pipelineIds []string
 	for _, p := range pipelines[:5] {
@@ -39,7 +39,7 @@ func getPipelineSuggestions(apiClient *adapter.GitlabAPIClient) []string {
 	return pipelineIds
 }
 
-func handleJobsCommand(args []string, apiClient *adapter.GitlabAPIClient) (string, error) {
+func handleJobsCommand(args []string, apiClient *adapter.App) (string, error) {
 
 	var pipelineId string
 
@@ -67,6 +67,6 @@ func handleJobsCommand(args []string, apiClient *adapter.GitlabAPIClient) (strin
 
 func init() {
 	InitConfig()
-	jobsCmd := NewJobsCmd(adapter.NewGitlabAPIClient())
+	jobsCmd := NewJobsCmd(adapter.NewApp())
 	rootCmd.AddCommand(jobsCmd)
 }
