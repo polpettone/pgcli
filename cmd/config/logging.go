@@ -21,13 +21,12 @@ func NewLogging(enabled bool) *Logging {
 	if enabled {
 		infoLog = log.New(openLogFile("pgcli_info.log"), "INFO\t", log.Ldate|log.Ltime)
 		debugLog = log.New(openLogFile("pgcli_debug.log"), "DEBUG\t", log.Ldate|log.Ltime)
-		errorLog = log.New(openLogFile("pgcli_error.log"), "ERROR\t", log.Ldate|log.Ltime)
 	} else {
 		infoLog = log.New(ioutil.Discard, "", 0)
-		errorLog = log.New(ioutil.Discard, "", 0)
 		debugLog = log.New(ioutil.Discard, "", 0)
 	}
 
+	errorLog = log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 	app := &Logging{
 		ErrorLog: errorLog,

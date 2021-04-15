@@ -5,10 +5,6 @@ import (
 	"fmt"
 )
 
-type Projects struct {
-	Projects []Project
-}
-
 type Project struct {
 	Id              int `json:"id"`
 	Name            string

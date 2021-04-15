@@ -22,12 +22,22 @@ type GitlabAPIClient struct {
 func NewGitlabAPIClient() *GitlabAPIClient {
 
 	loggingEnabled := viper.GetBool("logging_enabled")
+	logging :=         config.NewLogging(loggingEnabled)
+	state, err := config.ReadState("/home/esteban/.config/pgcli/state.json")
+
+	var projectID string
+	if err != nil {
+		logging.ErrorLog.Printf("Could not read state, using default project ID from config. %v", err)
+		projectID = viper.GetString("project_id")
+	} else {
+		projectID = state.CurrentProject
+	}
 
 	return &GitlabAPIClient{
 		GitlabAPIToken:   viper.GetString("api_token"),
 		GitlabProjectURL: viper.GetString("url"),
-		ProjectID:        viper.GetString("project_id"),
-		Logging:          config.NewLogging(loggingEnabled),
+		ProjectID:        projectID,
+		Logging:          logging,
 	}
 }
 

@@ -3,9 +3,15 @@ package commands
 import (
 	"fmt"
 	"github.com/polpettone/pgcli/cmd/adapter"
+	"github.com/polpettone/pgcli/cmd/config"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
+
+func init() {
+	InitConfig()
+	projectCmd := ProjectsCmd(adapter.NewGitlabAPIClient())
+	rootCmd.AddCommand(projectCmd)
+}
 
 func ProjectsCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
 	return &cobra.Command{
@@ -22,50 +28,38 @@ func ProjectsCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command {
 	}
 }
 
-func tryConfigWrite() {
-	projects := viper.GetStringSlice("projects")
-	fmt.Println("Projects")
-	fmt.Println(projects)
+func handleProjectCommand(args []string, apiClient *adapter.GitlabAPIClient) (string, error) {
+	if len(args) == 0 {
+		return getProjects(apiClient)
+	}
 
-	current_project := viper.GetString("current_project")
+	state := config.State{
+		CurrentProject: args[0],
+	}
 
-	fmt.Println("Current Project")
-	fmt.Println(current_project)
+	err := config.WriteState(state, "/home/esteban/.config/pgcli/state.json")
+	if err != nil {
+		apiClient.Logging.ErrorLog.Printf("%v", err)
+	}
+	if err != nil {
+		apiClient.Logging.ErrorLog.Printf("%s", err)
+	}
 
-	viper.Set("current_project", "dummy")
-
-	current_project = viper.GetString("current_project")
-	fmt.Println("Current Project")
-	fmt.Println(current_project)
-
-	foo := viper.GetBool("foo")
-	fmt.Println(foo)
-	fmt.Println("Set Foo to True")
-	viper.Set("foo", true)
-	foo = viper.GetBool("foo")
-	fmt.Println(foo)
-
-	viper.WriteConfig()
+	return fmt.Sprintf("Changed Project to %s", args[0]), nil
 }
 
-func handleProjectCommand(args []string, apiClient *adapter.GitlabAPIClient) (string, error) {
 
+
+func getProjects(apiClient *adapter.GitlabAPIClient) (string, error) {
 	projects, err := apiClient.GetProjects()
-
 	if err != nil {
 		return "", nil
 	}
-
 	value := ""
 	for _, project := range projects {
 		value = value + "\n" + project.NiceString()
 	}
-
 	return value, nil
 }
 
-func init() {
-	InitConfig()
-	projectCmd := ProjectsCmd(adapter.NewGitlabAPIClient())
-	rootCmd.AddCommand(projectCmd)
-}
+

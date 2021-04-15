@@ -24,6 +24,10 @@ func NewPipelinesCmd(apiClient *adapter.GitlabAPIClient) *cobra.Command{
 }
 
 func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *adapter.GitlabAPIClient) (string, error) {
+
+
+
+
 	status, _  := cobraCommand.Flags().GetString("status")
 	count, _ := cobraCommand.Flags().GetInt("count")
 	withUser, _ := cobraCommand.Flags().GetBool("user")
