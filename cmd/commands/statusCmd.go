@@ -55,6 +55,7 @@ func handleStatusCommand(args []string, apiClient *adapter.App) error {
 
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Name", "Status", "Started", "Finished"})
+	table.SetBorder(false)
 	for _, d := range data {
 		table.Append(d)
 	}
