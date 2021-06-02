@@ -39,10 +39,10 @@ func handleProjectCommand(args []string, apiClient *adapter.App) {
 
 	err := config.WriteState(state, "/home/esteban/.config/pgcli/state.json")
 	if err != nil {
-		apiClient.Logging.ErrorLog.Printf("%v", err)
+		config.Log.ErrorLog.Printf("%v", err)
 	}
 	if err != nil {
-		apiClient.Logging.ErrorLog.Printf("%s", err)
+		config.Log.ErrorLog.Printf("%s", err)
 	}
 
 	fmt.Printf("Changed Project to %s", args[0])
@@ -54,7 +54,7 @@ func getProjects(app *adapter.App) {
 	projects, err := app.GetProjects()
 
 	if err != nil {
-		app.Logging.ErrorLog.Printf("%v", err)
+		config.Log.ErrorLog.Printf("%v", err)
 		return
 	}
 

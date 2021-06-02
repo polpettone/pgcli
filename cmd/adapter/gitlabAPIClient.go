@@ -16,7 +16,6 @@ type App struct {
 	GitlabAPIToken   string
 	GitlabProjectURL string
 	ProjectID        string
-	Logging          *config.Logging
 }
 
 func NewApp() *App {
@@ -37,7 +36,6 @@ func NewApp() *App {
 		GitlabAPIToken:   viper.GetString("api_token"),
 		GitlabProjectURL: viper.GetString("url"),
 		ProjectID:        projectID,
-		Logging:          logging,
 	}
 }
 
@@ -53,9 +51,9 @@ func (app *App) GetProjects() ([]models.Project, error) {
 	req.Header.Set("PRIVATE-TOKEN", app.GitlabAPIToken)
 	client := &http.Client{Timeout: time.Second * 5}
 
-	app.Logging.DebugLog.Printf("%v", req)
+	config.Log.DebugLog.Printf("%v", req)
 	resp, err := client.Do(req)
-	app.Logging.DebugLog.Printf("%v", resp)
+	config.Log.DebugLog.Printf("%v", resp)
 
 	if err != nil {
 		return nil, err
@@ -89,9 +87,10 @@ func (app *App) GetJobs(pipelineId string) ([]models.Job, error) {
 	req.Header.Set("PRIVATE-TOKEN", app.GitlabAPIToken)
 	client := &http.Client{Timeout: time.Second * 5}
 
-	app.Logging.DebugLog.Printf("%v", req)
+	config.Log.DebugLog.Printf("%v", req)
+
 	resp, err := client.Do(req)
-	app.Logging.DebugLog.Printf("%v", resp)
+	config.Log.DebugLog.Printf("%v", resp)
 
 	if err != nil {
 		return nil, err
@@ -128,11 +127,11 @@ func (app App) GetPipelines(status string, count int) ([]*models.Pipeline, error
 	req.Header.Set("PRIVATE-TOKEN", app.GitlabAPIToken)
 	client := &http.Client{Timeout: time.Second * 5}
 
-	app.Logging.DebugLog.Printf("%v", req)
+	config.Log.DebugLog.Printf("%v", req)
 
 	resp, err := client.Do(req)
 
-	app.Logging.DebugLog.Printf("%v", resp)
+	config.Log.DebugLog.Printf("%v", resp)
 
 	if err != nil {
 		return nil, err
@@ -255,9 +254,9 @@ func (app App) GetPipeline(id string) (*models.Pipeline, error) {
 	req.Header.Set("PRIVATE-TOKEN", app.GitlabAPIToken)
 	client := &http.Client{Timeout: time.Second * 5}
 
-	app.Logging.DebugLog.Printf("%v", req)
+	config.Log.DebugLog.Printf("%v", req)
 	resp, err := client.Do(req)
-	app.Logging.DebugLog.Printf("%v", resp)
+	config.Log.DebugLog.Printf("%v", resp)
 
 	if err != nil {
 		return nil, err

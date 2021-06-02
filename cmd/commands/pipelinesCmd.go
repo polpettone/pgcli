@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"github.com/polpettone/pgcli/cmd/adapter"
+	"github.com/polpettone/pgcli/cmd/config"
 	"github.com/polpettone/pgcli/cmd/models"
 	"github.com/spf13/cobra"
 )
@@ -14,7 +15,7 @@ func NewPipelinesCmd(apiClient *adapter.App) *cobra.Command{
 		Long:  "shows the last 5 Pipelines",
 		Run: func(cmd *cobra.Command, args []string) {
 			stdout, err := handlePipelineCommand(cmd, apiClient)
-			apiClient.Logging.InfoLog.Printf("Pipeline Command Called")
+			config.Log.InfoLog.Printf("Pipeline Command Called")
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -24,9 +25,6 @@ func NewPipelinesCmd(apiClient *adapter.App) *cobra.Command{
 }
 
 func handlePipelineCommand(cobraCommand *cobra.Command, apiClient *adapter.App) (string, error) {
-
-
-
 
 	status, _  := cobraCommand.Flags().GetString("status")
 	count, _ := cobraCommand.Flags().GetInt("count")

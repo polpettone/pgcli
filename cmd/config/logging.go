@@ -6,10 +6,17 @@ import (
 	"os"
 )
 
+
+var Log *Logging
+
 type Logging struct {
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
 	DebugLog *log.Logger
+}
+
+func init() {
+	Log = NewLogging(false)
 }
 
 func NewLogging(enabled bool) *Logging {
