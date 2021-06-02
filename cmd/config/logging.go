@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"os"
@@ -15,8 +16,9 @@ type Logging struct {
 	DebugLog *log.Logger
 }
 
-func init() {
-	Log = NewLogging(false)
+func InitLogging() {
+	loggingEnabled := viper.GetBool("logging_enabled")
+	Log = NewLogging(loggingEnabled)
 }
 
 func NewLogging(enabled bool) *Logging {

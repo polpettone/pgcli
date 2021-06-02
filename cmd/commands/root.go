@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"github.com/polpettone/pgcli/cmd/config"
 	"github.com/spf13/cobra"
 	"os"
 
@@ -31,6 +32,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(InitConfig)
+	config.InitLogging()
 }
 
 func InitConfig() {

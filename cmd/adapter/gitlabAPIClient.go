@@ -19,14 +19,11 @@ type App struct {
 }
 
 func NewApp() *App {
-
-	loggingEnabled := viper.GetBool("logging_enabled")
-	logging := config.NewLogging(loggingEnabled)
 	state, err := config.ReadState("/home/esteban/.config/pgcli/state.json")
 
 	var projectID string
 	if err != nil {
-		logging.ErrorLog.Printf("Could not read state, using default project ID from config. %v", err)
+		config.Log.ErrorLog.Printf("Could not read state, using default project ID from config. %v", err)
 		projectID = viper.GetString("project_id")
 	} else {
 		projectID = state.CurrentProject
